@@ -95,20 +95,38 @@ infisical_backend_environment_variable_mongo_url: 'mongodb://{{ infisical_mongod
 # Controls the SITE_URL environment variable for the backend service
 infisical_backend_environment_variable_site_url: "{{ infisical_scheme }}://{{ infisical_hostname }}{{ '' if infisical_path_prefix == '/' else infisical_path_prefix }}"
 
-# Controls the SMTP_HOST environment variable for the backend service
+# Controls the SMTP_HOST environment variable for the backend service.
+# See: https://infisical.com/docs/self-hosting/configuration/email
 infisical_backend_environment_variable_smtp_host: ''
 
-# Controls the SMTP_PORT environment variable for the backend service
+# Controls the SMTP_PORT environment variable for the backend service.
+# See: https://infisical.com/docs/self-hosting/configuration/email
 infisical_backend_environment_variable_smtp_port: ''
 
-# Controls the SMTP_NAME environment variable for the backend service
+# Controls the SMTP_NAME environment variable for the backend service.
+# See: https://infisical.com/docs/self-hosting/configuration/email
 infisical_backend_environment_variable_smtp_name: ''
 
-# Controls the SMTP_USERNAME environment variable for the backend service
+# Controls the SMTP_USERNAME environment variable for the backend service.
+# See: https://infisical.com/docs/self-hosting/configuration/email
 infisical_backend_environment_variable_smtp_username: ''
 
-# Controls the SMTP_PASSWORD environment variable for the backend service
+# Controls the SMTP_PASSWORD environment variable for the backend service.
+# See: https://infisical.com/docs/self-hosting/configuration/email
 infisical_backend_environment_variable_smtp_password: ''
+
+# Controls the SMTP_FROM_ADDRESS environment variable for the backend service.
+# See: https://infisical.com/docs/self-hosting/configuration/email
+infisical_backend_environment_variable_smtp_from_address: ''
+
+# Controls the SMTP_FROM_NAME environment variable for the backend service.
+# See: https://infisical.com/docs/self-hosting/configuration/email
+infisical_backend_environment_variable_smtp_from_name: ''
+
+# Controls the SMTP_SECURE environment variable for the backend service.
+# For TLS using STARTTLS, this should be set to false.
+# See: https://infisical.com/docs/self-hosting/configuration/email
+infisical_backend_environment_variable_smtp_secure: false
 
 # Controls the SENTRY_DSN environment variable for the backend service
 infisical_backend_environment_variable_sentry_dsn: ''
