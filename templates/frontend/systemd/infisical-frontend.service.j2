@@ -22,7 +22,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
 			--read-only \
 			--network={{ infisical_container_network }} \
 			{% if infisical_frontend_container_http_bind_port %}
-			-p {{ infisical_frontend_container_http_bind_port }}:4000 \
+			-p {{ infisical_frontend_container_http_bind_port }}:3000 \
 			{% endif %}
 			--env-file={{ infisical_frontend_path }}/env \
 			--label-file={{ infisical_frontend_path }}/labels \
