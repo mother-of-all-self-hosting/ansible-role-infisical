@@ -1,0 +1,52 @@
+#jinja2: lstrip_blocks: "True"
+[Unit]
+Description=Infisical Frontend ({{ infisical_identifier }}-frontend)
+{% for service in infisical_frontend_systemd_required_services_list %}
+Requires={{ service }}
+After={{ service }}
+{% endfor %}
+DefaultDependencies=no
+
+[Service]
+Type=simple
+Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} kill {{ infisical_identifier }}-frontend 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }}-frontend 2>/dev/null || true'
+
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
+			--rm \
+			--name={{ infisical_identifier }}-frontend \
+			--log-driver=none \
+			--user={{ infisical_uid }}:{{ infisical_gid }} \
+			--cap-drop=ALL \
+			--read-only \
+			--network={{ infisical_container_network }} \
+			{% if infisical_frontend_container_http_bind_port %}
+			-p {{ infisical_frontend_container_http_bind_port }}:4000 \
+			{% endif %}
+			--env-file={{ infisical_frontend_path }}/env \
+			--label-file={{ infisical_frontend_path }}/labels \
+			{% for volume in infisical_frontend_container_additional_volumes %}
+			--mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
+			{% endfor %}
+			--tmpfs=/.npm:rw,noexec,nosuid,size=128m \
+			{% for arg in infisical_frontend_container_extra_arguments %}
+			{{ arg }} \
+			{% endfor %}
+			{{ infisical_frontend_container_image }}
+
+{% for network in infisical_frontend_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ infisical_identifier }}-frontend
+{% endfor %}
+
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ infisical_identifier }}-frontend
+
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} kill {{ infisical_identifier }}-frontend 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }}-frontend 2>/dev/null || true'
+
+Restart=always
+RestartSec=30
+SyslogIdentifier={{ infisical_identifier }}-frontend
+
+[Install]
+WantedBy=multi-user.target

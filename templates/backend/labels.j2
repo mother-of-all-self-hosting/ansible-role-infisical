@@ -1,0 +1,53 @@
+{% if infisical_backend_container_labels_traefik_enabled %}
+traefik.enable=true
+
+{% if infisical_backend_container_labels_traefik_docker_network %}
+traefik.docker.network={{ infisical_backend_container_labels_traefik_docker_network }}
+{% endif %}
+
+{% set middlewares = [] %}
+
+{% if infisical_backend_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ infisical_identifier }}-backend-slashless-redirect.redirectregex.regex=^({{ infisical_backend_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ infisical_identifier }}-backend-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [infisical_identifier + '-backend-slashless-redirect'] %}
+{% endif %}
+
+{% if infisical_backend_container_labels_traefik_path_prefix != '/api' %}
+traefik.http.middlewares.{{ infisical_identifier }}-backend-replace-path.replacepathregex.regex=^{{ infisical_backend_container_labels_traefik_path_prefix }}(.*)
+traefik.http.middlewares.{{ infisical_identifier }}-backend-replace-path.replacepathregex.replacement=/api/${1}
+{% set middlewares = middlewares + [infisical_identifier + '-backend-replace-path'] %}
+{% endif %}
+
+{% if infisical_backend_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
+{% for name, value in infisical_backend_container_labels_traefik_additional_request_headers.items() %}
+traefik.http.middlewares.{{ infisical_identifier }}-backend-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [infisical_identifier + '-backend-add-request-headers'] %}
+{% endif %}
+
+{% if infisical_backend_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
+{% for name, value in infisical_backend_container_labels_traefik_additional_response_headers.items() %}
+traefik.http.middlewares.{{ infisical_identifier }}-backend-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [infisical_identifier + '-backend-add-response-headers'] %}
+{% endif %}
+
+traefik.http.routers.{{ infisical_identifier }}-backend.rule={{ infisical_backend_container_labels_traefik_rule }}
+{% if infisical_backend_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ infisical_identifier }}-backend.priority={{ infisical_backend_container_labels_traefik_priority }}
+{% endif %}
+traefik.http.routers.{{ infisical_identifier }}-backend.service={{ infisical_identifier }}-backend
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ infisical_identifier }}-backend.middlewares={{ middlewares | join(',') }}
+{% endif %}
+traefik.http.routers.{{ infisical_identifier }}-backend.entrypoints={{ infisical_backend_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ infisical_identifier }}-backend.tls={{ infisical_backend_container_labels_traefik_tls | to_json }}
+{% if infisical_backend_container_labels_traefik_tls %}
+traefik.http.routers.{{ infisical_identifier }}-backend.tls.certResolver={{ infisical_backend_container_labels_traefik_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ infisical_identifier }}-backend.loadbalancer.server.port=4000
+{% endif %}
+
+{{ infisical_backend_container_labels_additional_labels }}

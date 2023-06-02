@@ -1,0 +1,59 @@
+---
+
+- name: Ensure Infisical paths exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0750
+    owner: "{{ infisical_uid }}"
+    group: "{{ infisical_gid }}"
+  with_items:
+    - "{{ infisical_base_path }}"
+    - "{{ infisical_backend_path }}"
+    - "{{ infisical_frontend_path }}"
+
+- name: Ensure Infisical support files installed
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/{{ item.src }}"
+    dest: "{{ item.dst }}"
+    mode: 0640
+    owner: "{{ infisical_uid }}"
+    group: "{{ infisical_gid }}"
+  with_items:
+    - src: backend/env.j2
+      dst: "{{ infisical_backend_path }}/env"
+    - src: backend/labels.j2
+      dst: "{{ infisical_backend_path }}/labels"
+    - src: frontend/env.j2
+      dst: "{{ infisical_frontend_path }}/env"
+    - src: frontend/labels.j2
+      dst: "{{ infisical_frontend_path }}/labels"
+
+- name: Ensure Infisical backend container image is pulled
+  community.docker.docker_image:
+    name: "{{ infisical_backend_container_image }}"
+    source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
+    force_source: "{{ infisical_backend_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else infisical_backend_container_image_force_pull }}"
+  register: result
+  retries: "{{ devture_playbook_help_container_retries_count }}"
+  delay: "{{ devture_playbook_help_container_retries_delay }}"
+  until: result is not failed
+
+- name: Ensure Infisical container networks created
+  community.general.docker_network:
+    name: "{{ item }}"
+    driver: bridge
+  with_items:
+    - "{{ infisical_backend_container_network }}"
+    - "{{ infisical_frontend_container_network }}"
+
+- name: Ensure Infisical backend systemd service is present
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/backend/systemd/infisical-backend.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-backend.service"
+
+- name: Ensure Infisical frontend systemd service is present
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/frontend/systemd/infisical-frontend.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-frontend.service"
