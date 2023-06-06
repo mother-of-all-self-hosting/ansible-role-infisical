@@ -131,6 +131,9 @@ infisical_backend_environment_variable_smtp_secure: false
 # Controls the SENTRY_DSN environment variable for the backend service
 infisical_backend_environment_variable_sentry_dsn: ''
 
+# Controls the NODE_ENV environment variable for the backend service
+infisical_backend_environment_variable_node_env: production
+
 # Controls the INVITE_ONLY_SIGNUP environment variable for the backend service
 infisical_backend_environment_variable_invite_only_signup: false
 
