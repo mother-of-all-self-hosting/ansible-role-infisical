@@ -3,22 +3,25 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
-- block:
-    - when: infisical_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
-
-    - when: infisical_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+- name: Perform Infisical installation tasks
   tags:
     - setup-all
     - setup-infisical
     - install-all
     - install-infisical
+  block:
+    - name: Validate Infisical configuration
+      when: infisical_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+    - name: Install Infisical
+      when: infisical_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
-- block:
-    - when: not infisical_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
+- name: Perform Infisical uninstallation tasks
   tags:
     - setup-all
     - setup-infisical
+  block:
+    - name: Uninstall Infisical
+      when: not infisical_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"

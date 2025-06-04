@@ -3,13 +3,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Check existence of Infisical backend systemd service
   ansible.builtin.stat:
     path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-backend.service"
   register: infisical_backend_service_stat
 
-- when: infisical_backend_service_stat.stat.exists | bool
+- name: Uninstall Infisical backend systemd services and files
+  when: infisical_backend_service_stat.stat.exists | bool
   block:
     - name: Ensure Infisical backend systemd service is stopped
       ansible.builtin.service:
@@ -23,13 +23,13 @@
         path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-backend.service"
         state: absent
 
-
 - name: Check existence of Infisical frontend systemd service
   ansible.builtin.stat:
     path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-frontend.service"
   register: infisical_frontend_service_stat
 
-- when: infisical_frontend_service_stat.stat.exists | bool
+- name: Uninstall Infisical frontend systemd services and files
+  when: infisical_frontend_service_stat.stat.exists | bool
   block:
     - name: Ensure Infisical frontend systemd service is stopped
       ansible.builtin.service:
@@ -43,7 +43,7 @@
         path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-frontend.service"
         state: absent
 
-    - name: Ensure Infisical path doesn't exist
+    - name: Ensure Infisical path does not exist
       ansible.builtin.file:
         path: "{{ infisical_base_path }}"
         state: absent

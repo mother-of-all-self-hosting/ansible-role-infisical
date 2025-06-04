@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Fail if required Infisical settings not defined
   ansible.builtin.fail:
     msg: >
@@ -31,7 +30,8 @@
       infisical_path_prefix (`{{ infisical_path_prefix }}`) must be `/` right now. Hosting under a path prefix is not currently supported.
   when: "infisical_path_prefix != '/'"
 
-- when: infisical_backend_container_labels_traefik_enabled | bool
+- name: Run if Traefik is enabled
+  when: infisical_backend_container_labels_traefik_enabled | bool
   block:
     - name: Fail if required Infisical Traefik settings not defined
       ansible.builtin.fail:
