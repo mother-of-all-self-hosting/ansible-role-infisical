@@ -13,6 +13,7 @@ infisical_identifier: infisical
 infisical_uid: ''
 infisical_gid: ''
 
+# renovate: datasource=docker depName=infisical/backend
 infisical_version: v0.43.19
 
 infisical_scheme: https
