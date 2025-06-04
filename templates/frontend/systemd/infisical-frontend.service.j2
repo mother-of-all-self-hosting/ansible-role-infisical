@@ -1,4 +1,9 @@
-#jinja2: lstrip_blocks: "True"
+{#
+SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+#}
+
 [Unit]
 Description=Infisical Frontend ({{ infisical_identifier }}-frontend)
 {% for service in infisical_frontend_systemd_required_services_list %}

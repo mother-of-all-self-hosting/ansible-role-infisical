@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 # Infisical Ansible role
 
 This is an [Ansible](https://www.ansible.com/) role which installs [Infisical](https://infisical.com/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
