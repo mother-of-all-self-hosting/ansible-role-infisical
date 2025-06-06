@@ -4,6 +4,7 @@
 
 ---
 - name: Perform Infisical installation tasks
+  when: infisical_enabled | bool
   tags:
     - setup-all
     - setup-infisical
@@ -11,17 +12,15 @@
     - install-infisical
   block:
     - name: Validate Infisical configuration
-      when: infisical_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
     - name: Install Infisical
-      when: infisical_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
 - name: Perform Infisical uninstallation tasks
+  when: not infisical_enabled | bool
   tags:
     - setup-all
     - setup-infisical
   block:
     - name: Uninstall Infisical
-      when: not infisical_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
