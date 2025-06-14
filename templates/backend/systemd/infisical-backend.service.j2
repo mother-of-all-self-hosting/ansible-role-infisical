@@ -19,26 +19,26 @@ ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_s
 ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }}-backend 2>/dev/null || true'
 
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
-			--rm \
-			--name={{ infisical_identifier }}-backend \
-			--log-driver=none \
-			--user={{ infisical_uid }}:{{ infisical_gid }} \
-			--cap-drop=ALL \
-			--read-only \
-			--network={{ infisical_container_network }} \
-			{% if infisical_backend_container_http_bind_port %}
-			-p {{ infisical_backend_container_http_bind_port }}:4000 \
-			{% endif %}
-			--env-file={{ infisical_backend_path }}/env \
-			--label-file={{ infisical_backend_path }}/labels \
-			{% for volume in infisical_backend_container_additional_volumes %}
-			--mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
-			{% endfor %}
-			--tmpfs=/.npm:rw,noexec,nosuid,size=128m \
-			{% for arg in infisical_backend_container_extra_arguments %}
-			{{ arg }} \
-			{% endfor %}
-			{{ infisical_backend_container_image }}
+      --rm \
+      --name={{ infisical_identifier }}-backend \
+      --log-driver=none \
+      --user={{ infisical_uid }}:{{ infisical_gid }} \
+      --cap-drop=ALL \
+      --read-only \
+      --network={{ infisical_container_network }} \
+      {% if infisical_backend_container_http_bind_port %}
+      -p {{ infisical_backend_container_http_bind_port }}:4000 \
+      {% endif %}
+      --env-file={{ infisical_backend_path }}/env \
+      --label-file={{ infisical_backend_path }}/labels \
+      {% for volume in infisical_backend_container_additional_volumes %}
+      --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
+      {% endfor %}
+      --tmpfs=/.npm:rw,noexec,nosuid,size=128m \
+      {% for arg in infisical_backend_container_extra_arguments %}
+      {{ arg }} \
+      {% endfor %}
+      {{ infisical_backend_container_image }}
 
 {% for network in infisical_backend_container_additional_networks %}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ infisical_identifier }}-backend
