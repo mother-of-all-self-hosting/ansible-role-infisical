@@ -44,7 +44,7 @@
   until: result is not failed
 
 - name: Ensure Infisical container networks are created
-  community.general.docker_network:
+  community.docker.docker_network:
     name: "{{ item }}"
     driver: bridge
   with_items:
