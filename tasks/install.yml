@@ -32,7 +32,8 @@
     - src: frontend/labels.j2
       dst: "{{ infisical_frontend_path }}/labels"
 
-- name: Ensure Infisical backend container image is pulled
+- name: Ensure Infisical backend container image is pulled via community.docker.docker_image
+  when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
   community.docker.docker_image:
     name: "{{ infisical_backend_container_image }}"
     source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
@@ -43,7 +44,17 @@
   delay: "{{ devture_playbook_help_container_retries_delay }}"
   until: result is not failed
 
-- name: Ensure Infisical container networks are created
+- name: Ensure Infisical backend container image is pulled via ansible.builtin.command
+  when: devture_systemd_docker_base_container_image_pull_method == 'command'
+  ansible.builtin.command:
+    cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical_backend_container_image }}"
+  register: result
+  retries: "{{ devture_playbook_help_container_retries_count }}"
+  delay: "{{ devture_playbook_help_container_retries_delay }}"
+  until: result is not failed
+  changed_when: "'Downloaded newer image' in result.stdout"
+
+- name: Ensure Infisical container networks are created via community.docker.docker_network
   community.docker.docker_network:
     name: "{{ item }}"
     driver: bridge
