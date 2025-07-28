@@ -189,7 +189,7 @@ infisical_backend_container_labels_traefik_tls: "{{ infisical_backend_container_
 infisical_backend_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
 # Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `infisical_backend_container_labels_traefik_additional_response_headers_custom`
+# To add your own custom request headers, use `infisical_backend_container_labels_traefik_additional_request_headers_custom`
 infisical_backend_container_labels_traefik_additional_request_headers: "{{ infisical_backend_container_labels_traefik_additional_request_headers_auto | combine(infisical_backend_container_labels_traefik_additional_request_headers_custom) }}"
 infisical_backend_container_labels_traefik_additional_request_headers_auto: {}
 infisical_backend_container_labels_traefik_additional_request_headers_custom: {}
@@ -283,7 +283,7 @@ infisical_frontend_container_labels_traefik_tls: "{{ infisical_frontend_containe
 infisical_frontend_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
 # Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `infisical_frontend_container_labels_traefik_additional_response_headers_custom`
+# To add your own custom request headers, use `infisical_frontend_container_labels_traefik_additional_request_headers_custom`
 infisical_frontend_container_labels_traefik_additional_request_headers: "{{ infisical_frontend_container_labels_traefik_additional_request_headers_auto | combine(infisical_frontend_container_labels_traefik_additional_request_headers_custom) }}"
 infisical_frontend_container_labels_traefik_additional_request_headers_auto: {}
 infisical_frontend_container_labels_traefik_additional_request_headers_custom: {}
