@@ -16,6 +16,12 @@ infisical_gid: ''
 # renovate: datasource=docker depName=infisical/infisical
 infisical_version: v0.153.4
 
+# use the new all-in-one image
+infisical_container_image_registry_prefix: docker.io/
+infisical_container_image_tag: "{{ infisical_version }}"
+infisical_container_image: "{{ infisical_container_image_registry_prefix }}infisical/infisical:{{ infisical_container_image_tag }}"
+infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':latest') }}"
+
 infisical_scheme: https
 
 # The hostname at which Infisical is served.
