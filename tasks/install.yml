@@ -21,9 +21,9 @@
     owner: "{{ infisical_uid }}"
     group: "{{ infisical_gid }}"
   with_items:
-    - src: base/env.j2
+    - src: frontend/env.j2
       dst: "{{ infisical_base_path }}/env"
-    - src: base/labels.j2
+    - src: frontend/labels.j2
       dst: "{{ infisical_base_path }}/labels"
 
 - name: Ensure Infisical base container image is pulled via community.docker.docker_image
@@ -57,6 +57,6 @@
 
 - name: Ensure Infisical base systemd service is present
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/base/systemd/infisical-base.service.j2"
+    src: "{{ role_path }}/templates/frontend/systemd/infisical-base.service.j2"
     dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-base.service"
     mode: "0644"
