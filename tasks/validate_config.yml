@@ -24,11 +24,11 @@
     - infisical_hostname
     - infisical_path_prefix
     - infisical_container_network
-    - infisical__environment_variable_encryption_key
-    - infisical__environment_variable_jwt_signup_secret
-    - infisical__environment_variable_jwt_refresh_secret
-    - infisical__environment_variable_jwt_auth_secret
-    - infisical__environment_variable_jwt_service_secret
+    - infisical_backend_environment_variable_encryption_key
+    - infisical_backend_environment_variable_jwt_signup_secret
+    - infisical_backend_environment_variable_jwt_refresh_secret
+    - infisical_backend_environment_variable_jwt_auth_secret
+    - infisical_backend_environment_variable_jwt_service_secret
     - infisical_mongodb_username
     - infisical_mongodb_password
     - infisical_mongodb_hostname
@@ -40,7 +40,7 @@
   when: "infisical_path_prefix != '/'"
 
 - name: Run if Traefik is enabled
-  when: infisical__container_labels_traefik_enabled | bool
+  when: infisical_backend_container_labels_traefik_enabled | bool
   block:
     - name: Fail if Traefik settings required for Infisical are not defined
       ansible.builtin.fail:
@@ -48,14 +48,14 @@
           You need to define a required configuration setting (`{{ item }}`).
       when: "lookup('vars', item, default='') | string | length == 0"
       with_items:
-        - infisical__container_labels_traefik_hostname
-        - infisical__container_labels_traefik_path_prefix
+        - infisical_backend_container_labels_traefik_hostname
+        - infisical_backend_container_labels_traefik_path_prefix
 
     # We ensure it doesn't end with a slash, because we handle both (slash and no-slash).
-    # Knowing that `infisical__container_labels_traefik_path_prefix` does not end with a slash
+    # Knowing that `infisical_backend_container_labels_traefik_path_prefix` does not end with a slash
     # ensures we know how to set these routes up without having to do "does it end with a slash" checks elsewhere.
-    - name: Fail if infisical__container_labels_traefik_path_prefix ends with a slash
+    - name: Fail if infisical_backend_container_labels_traefik_path_prefix ends with a slash
       ansible.builtin.fail:
         msg: >-
-          infisical__container_labels_traefik_path_prefix (`{{ infisical__container_labels_traefik_path_prefix }}`) must either be `/` or not end with a slash (e.g. `/infisical`).
-      when: "infisical__container_labels_traefik_path_prefix != '/' and infisical__container_labels_traefik_path_prefix[-1] == '/'"
+          infisical_backend_container_labels_traefik_path_prefix (`{{ infisical_backend_container_labels_traefik_path_prefix }}`) must either be `/` or not end with a slash (e.g. `/infisical`).
+      when: "infisical_backend_container_labels_traefik_path_prefix != '/' and infisical_backend_container_labels_traefik_path_prefix[-1] == '/'"
