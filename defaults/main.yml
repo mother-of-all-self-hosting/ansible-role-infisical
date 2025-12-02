@@ -13,8 +13,8 @@ infisical_identifier: infisical
 infisical_uid: ''
 infisical_gid: ''
 
-# renovate: datasource=docker depName=infisical/backend
-infisical_version: v0.43.19
+# renovate: datasource=docker depName=infisical/
+infisical_version: v0.154.2
 
 infisical_scheme: https
 
@@ -26,7 +26,6 @@ infisical_hostname: ''
 infisical_path_prefix: /
 
 infisical_base_path: "/{{ infisical_identifier }}"
-infisical_backend_path: "{{ infisical_base_path }}/backend"
 infisical_frontend_path: "{{ infisical_base_path }}/frontend"
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
@@ -39,176 +38,7 @@ infisical_container_additional_networks: "{{ infisical_container_additional_netw
 infisical_container_additional_networks_auto: []
 infisical_container_additional_networks_custom: []
 
-infisical_backend_container_image: "{{ infisical_backend_container_image_registry_prefix }}infisical/backend:{{ infisical_backend_container_image_tag }}"
-infisical_backend_container_image_registry_prefix: docker.io/
-infisical_backend_container_image_tag: "{{ infisical_version }}"
-infisical_backend_container_image_force_pull: "{{ infisical_backend_container_image.endswith(':latest') }}"
-
-infisical_backend_container_network: "{{ infisical_container_network }}"
-
-# A list of additional container networks that the backend container would be connected to.
-# The role does not create these networks, so make sure they already exist.
-# Use this to expose this container to another reverse proxy, which runs in a different container network.
-infisical_backend_container_additional_networks: "{{ infisical_backend_container_additional_networks_auto + infisical_backend_container_additional_networks_custom }}"
-infisical_backend_container_additional_networks_auto: "{{ infisical_container_additional_networks_auto }}"
-infisical_backend_container_additional_networks_custom: "{{ infisical_container_additional_networks_custom }}"
-
-# Specifies how the backend container publishes its HTTP port
-#
-# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:4000"), just a port number or an empty string to not expose.
-infisical_backend_container_http_bind_port: ''
-
-# infisical_backend_container_labels_additional_labels contains a multiline string with additional labels to add to the backend container label file.
-# See `../templates/backend/labels.j2` for details.
-#
-# Example:
-# infisical_backend_container_labels_additional_labels: |
-#   my.label=1
-#   another.label="here"
-infisical_backend_container_labels_additional_labels: ''
-
-# Controls the ENCRYPTION_KEY environment variable for the backend service
-infisical_backend_environment_variable_encryption_key: ''
-
-# Controls the JWT_SIGNUP_SECRET environment variable for the backend service
-infisical_backend_environment_variable_jwt_signup_secret: ''
-
-# Controls the JWT_REFRESH_SECRET environment variable for the backend service
-infisical_backend_environment_variable_jwt_refresh_secret: ''
-
-# Controls the JWT_AUTH_SECRET environment variable for the backend service
-infisical_backend_environment_variable_jwt_auth_secret: ''
-
-# Controls the JWT_SERVICE_SECRET environment variable for the backend service
-infisical_backend_environment_variable_jwt_service_secret: ''
-
-# Controls the JWT_AUTH_LIFETIME environment variable for the backend service
-# This is optional and can contain a timestamp (e.g. 60, "2 days", "10h", "7d")
-infisical_backend_environment_variable_jwt_auth_lifetime: ''
-
-# Controls the JWT_REFRESH_LIFETIME environment variable for the backend service
-# This is optional and can contain a timestamp (e.g. 60, "2 days", "10h", "7d")
-infisical_backend_environment_variable_jwt_refresh_lifetime: ''
-
-# Controls the JWT_SIGNUP_LIFETIME environment variable for the backend service
-# This is optional and can contain a timestamp (e.g. 60, "2 days", "10h", "7d")
-infisical_backend_environment_variable_jwt_signup_lifetime: ''
-
-# Controls the MONGO_URL environment variable for the backend service
-infisical_backend_environment_variable_mongo_url: 'mongodb://{{ infisical_mongodb_username }}:{{ infisical_mongodb_password }}@{{ infisical_mongodb_hostname }}:{{ infisical_mongodb_port }}/{{ infisical_mongodb_db_name }}?authSource={{ infisical_mongodb_auth_source }}'
-
-# Controls the SITE_URL environment variable for the backend service
-infisical_backend_environment_variable_site_url: "{{ infisical_scheme }}://{{ infisical_hostname }}{{ '' if infisical_path_prefix == '/' else infisical_path_prefix }}"
-
-# Controls the SMTP_HOST environment variable for the backend service.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_host: ''
-
-# Controls the SMTP_PORT environment variable for the backend service.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_port: ''
-
-# Controls the SMTP_NAME environment variable for the backend service.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_name: ''
-
-# Controls the SMTP_USERNAME environment variable for the backend service.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_username: ''
-
-# Controls the SMTP_PASSWORD environment variable for the backend service.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_password: ''
-
-# Controls the SMTP_FROM_ADDRESS environment variable for the backend service.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_from_address: ''
-
-# Controls the SMTP_FROM_NAME environment variable for the backend service.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_from_name: ''
-
-# Controls the SMTP_SECURE environment variable for the backend service.
-# For TLS using STARTTLS, this should be set to false.
-# See: https://infisical.com/docs/self-hosting/configuration/email
-infisical_backend_environment_variable_smtp_secure: false
-
-# Controls the SENTRY_DSN environment variable for the backend service
-infisical_backend_environment_variable_sentry_dsn: ''
-
-# Controls the NODE_ENV environment variable for the backend service
-infisical_backend_environment_variable_node_env: production
-
-# Controls the INVITE_ONLY_SIGNUP environment variable for the backend service
-infisical_backend_environment_variable_invite_only_signup: false
-
-# Controls the TELEMETRY_ENABLED environment variable for the backend service
-infisical_backend_environment_variable_telemetry_enabled: false
-
-# Additional environment variables for the backend container.
-# To discover available options, see: https://infisical.com/docs/self-hosting/configuration/envars
-infisical_backend_environment_variables_additional_variables: ''
-
-# A list of additional "volumes" to mount in the backend container.
-#
-# See the `--mount` documentation for the `docker run` command.
-#
-# Example:
-# infisical_backend_container_additional_volumes:
-#   - type: bind
-#     src: /path/on/the/host
-#     dst: /data
-#   - type: bind
-#     src: /another-path/on/the/host
-#     dst: /read-only
-#     options: readonly
-infisical_backend_container_additional_volumes: []
-
-# A list of extra arguments to pass to the backend container
-infisical_backend_container_extra_arguments: []
-
-# List of systemd services that infisical-backend.service depends on
-infisical_backend_systemd_required_services_list: "{{ infisical_backend_systemd_required_systemd_services_list_default + infisical_backend_systemd_required_systemd_services_list_auto + infisical_backend_systemd_required_systemd_services_list_custom }}"
-infisical_backend_systemd_required_systemd_services_list_default: ['docker.service']
-infisical_backend_systemd_required_systemd_services_list_auto: []
-infisical_backend_systemd_required_systemd_services_list_custom: []
-
-# infisical_backend_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the backend container.
-# See `../templates/backend/labels.j2` for details.
-#
-# To inject your own other container labels, see `infisical_backend_container_labels_additional_labels`.
-infisical_backend_container_labels_traefik_enabled: true
-infisical_backend_container_labels_traefik_docker_network: "{{ infisical_container_network }}"
-infisical_backend_container_labels_traefik_hostname: "{{ infisical_hostname }}"
-# The path prefix must either be `/` or not end with a slash (e.g. `/infisical`).
-infisical_backend_container_labels_traefik_path_prefix: "{{ '' if infisical_path_prefix == '/' else infisical_path_prefix }}/api"
-infisical_backend_container_labels_traefik_rule: "Host(`{{ infisical_backend_container_labels_traefik_hostname }}`){% if infisical_backend_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ infisical_backend_container_labels_traefik_path_prefix }}`){% endif %}"
-infisical_backend_container_labels_traefik_priority: 0
-infisical_backend_container_labels_traefik_entrypoints: web-secure
-infisical_backend_container_labels_traefik_tls: "{{ infisical_backend_container_labels_traefik_entrypoints != 'web' }}"
-infisical_backend_container_labels_traefik_tls_certResolver: default  # noqa var-naming
-
-# Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `infisical_backend_container_labels_traefik_additional_request_headers_custom`
-infisical_backend_container_labels_traefik_additional_request_headers: "{{ infisical_backend_container_labels_traefik_additional_request_headers_auto | combine(infisical_backend_container_labels_traefik_additional_request_headers_custom) }}"
-infisical_backend_container_labels_traefik_additional_request_headers_auto: {}
-infisical_backend_container_labels_traefik_additional_request_headers_custom: {}
-
-# Controls which additional headers to attach to all HTTP responses.
-# To add your own custom response headers, use `infisical_backend_container_labels_traefik_additional_response_headers_custom`
-infisical_backend_container_labels_traefik_additional_response_headers: "{{ infisical_backend_container_labels_traefik_additional_response_headers_auto | combine(infisical_backend_container_labels_traefik_additional_response_headers_custom) }}"
-infisical_backend_container_labels_traefik_additional_response_headers_auto: |
-  {{
-    {}
-    | combine ({'X-XSS-Protection': infisical_http_header_xss_protection} if infisical_http_header_xss_protection else {})
-    | combine ({'X-Content-Type-Options': infisical_http_header_content_type_options} if infisical_http_header_content_type_options else {})
-    | combine ({'Content-Security-Policy': infisical_http_header_content_security_policy} if infisical_http_header_content_security_policy else {})
-    | combine ({'Permissions-Policy': infisical_http_header_permissions_policy} if infisical_http_header_permissions_policy else {})
-    | combine ({'Strict-Transport-Security': infisical_http_header_strict_transport_security} if infisical_http_header_strict_transport_security and infisical_backend_container_labels_traefik_tls else {})
-  }}
-infisical_backend_container_labels_traefik_additional_response_headers_custom: {}
-
-infisical_frontend_container_image: "{{ infisical_backend_container_image_registry_prefix }}infisical/frontend:{{ infisical_frontend_container_image_tag }}"
+infisical_frontend_container_image: "{{ infisical__container_image_registry_prefix }}infisical/frontend:{{ infisical_frontend_container_image_tag }}"
 infisical_frontend_container_image_registry_prefix: docker.io/
 infisical_frontend_container_image_tag: "{{ infisical_version }}"
 infisical_frontend_container_image_force_pull: "{{ infisical_frontend_container_image.endswith(':latest') }}"

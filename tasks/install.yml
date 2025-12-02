@@ -12,7 +12,7 @@
     group: "{{ infisical_gid }}"
   with_items:
     - "{{ infisical_base_path }}"
-    - "{{ infisical_backend_path }}"
+    - "{{ infisical__path }}"
     - "{{ infisical_frontend_path }}"
 
 - name: Ensure Infisical support files installed
@@ -23,31 +23,31 @@
     owner: "{{ infisical_uid }}"
     group: "{{ infisical_gid }}"
   with_items:
-    - src: backend/env.j2
-      dst: "{{ infisical_backend_path }}/env"
-    - src: backend/labels.j2
-      dst: "{{ infisical_backend_path }}/labels"
+    - src: /env.j2
+      dst: "{{ infisical__path }}/env"
+    - src: /labels.j2
+      dst: "{{ infisical__path }}/labels"
     - src: frontend/env.j2
       dst: "{{ infisical_frontend_path }}/env"
     - src: frontend/labels.j2
       dst: "{{ infisical_frontend_path }}/labels"
 
-- name: Ensure Infisical backend container image is pulled via community.docker.docker_image
+- name: Ensure Infisical  container image is pulled via community.docker.docker_image
   when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
   community.docker.docker_image:
-    name: "{{ infisical_backend_container_image }}"
+    name: "{{ infisical__container_image }}"
     source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
-    force_source: "{{ infisical_backend_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
-    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else infisical_backend_container_image_force_pull }}"
+    force_source: "{{ infisical__container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else infisical__container_image_force_pull }}"
   register: result
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
   until: result is not failed
 
-- name: Ensure Infisical backend container image is pulled via ansible.builtin.command
+- name: Ensure Infisical  container image is pulled via ansible.builtin.command
   when: devture_systemd_docker_base_container_image_pull_method == 'command'
   ansible.builtin.command:
-    cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical_backend_container_image }}"
+    cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical__container_image }}"
   register: result
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
@@ -59,13 +59,13 @@
     name: "{{ item }}"
     driver: bridge
   with_items:
-    - "{{ infisical_backend_container_network }}"
+    - "{{ infisical__container_network }}"
     - "{{ infisical_frontend_container_network }}"
 
-- name: Ensure Infisical backend systemd service is present
+- name: Ensure Infisical  systemd service is present
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/backend/systemd/infisical-backend.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-backend.service"
+    src: "{{ role_path }}/templates//systemd/infisical-.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-.service"
     mode: "0644"
 
 - name: Ensure Infisical frontend systemd service is present

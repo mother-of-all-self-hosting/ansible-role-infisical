@@ -4,39 +4,39 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Check existence of Infisical backend systemd service
+- name: Check existence of Infisical  systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-backend.service"
-  register: infisical_backend_service_stat
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-.service"
+  register: infisical__service_stat
 
-- name: Uninstall Infisical backend systemd services and files
-  when: infisical_backend_service_stat.stat.exists | bool
+- name: Uninstall Infisical  systemd services and files
+  when: infisical__service_stat.stat.exists | bool
   block:
-    - name: Ensure Infisical backend systemd service is stopped
+    - name: Ensure Infisical  systemd service is stopped
       ansible.builtin.service:
-        name: "{{ infisical_identifier }}-backend"
+        name: "{{ infisical_identifier }}-"
         state: stopped
         enabled: false
         daemon_reload: true
 
-    - name: Ensure Infisical backend container network does not exist via community.docker.docker_network
+    - name: Ensure Infisical  container network does not exist via community.docker.docker_network
       when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
       community.docker.docker_network:
-        name: "{{ infisical_backend_container_network }}"
+        name: "{{ infisical__container_network }}"
         state: absent
 
-    - name: Ensure Infisical backend container network does not exist via ansible.builtin.command
+    - name: Ensure Infisical  container network does not exist via ansible.builtin.command
       when: devture_systemd_docker_base_container_network_creation_method == 'command'
       ansible.builtin.command:
         cmd: >-
           {{ devture_systemd_docker_base_host_command_docker }} network rm
-          {{ infisical_backend_container_network }}
+          {{ infisical__container_network }}
       register: network_deletion_result
-      changed_when: infisical_backend_container_network in network_deletion_result.stdout
+      changed_when: infisical__container_network in network_deletion_result.stdout
 
-    - name: Ensure Infisical backend systemd service does not exist
+    - name: Ensure Infisical  systemd service does not exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-backend.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}-.service"
         state: absent
 
 - name: Check existence of Infisical frontend systemd service
