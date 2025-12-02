@@ -14,7 +14,7 @@ infisical_uid: ''
 infisical_gid: ''
 
 # renovate: datasource=docker depName=infisical/
-infisical_version: v0.154.2
+infisical_version: v0.154.3
 
 infisical_scheme: https
 
@@ -38,7 +38,7 @@ infisical_container_additional_networks: "{{ infisical_container_additional_netw
 infisical_container_additional_networks_auto: []
 infisical_container_additional_networks_custom: []
 
-infisical_frontend_container_image: "{{ infisical__container_image_registry_prefix }}infisical/frontend:{{ infisical_frontend_container_image_tag }}"
+infisical_frontend_container_image: "{{ infisical_container_image_registry_prefix }}infisical:{{ infisical_frontend_container_image_tag }}"
 infisical_frontend_container_image_registry_prefix: docker.io/
 infisical_frontend_container_image_tag: "{{ infisical_version }}"
 infisical_frontend_container_image_force_pull: "{{ infisical_frontend_container_image.endswith(':latest') }}"
