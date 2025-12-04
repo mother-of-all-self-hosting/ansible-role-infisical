@@ -15,7 +15,7 @@ infisical_uid: ''
 infisical_gid: ''
 
 # renovate: datasource=docker depName=infisical/
-infisical_version: v0.154.3
+infisical_version: v0.154.4
 
 infisical_scheme: https
 
