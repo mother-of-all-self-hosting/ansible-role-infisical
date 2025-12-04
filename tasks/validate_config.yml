@@ -40,7 +40,7 @@
   when: "infisical_path_prefix != '/'"
 
 - name: Run if Traefik is enabled
-  when: infisical_frontend_container_labels_traefik_enabled | bool
+  when: infisical__container_labels_traefik_enabled | bool
   block:
     - name: Fail if Traefik settings required for Infisical are not defined
       ansible.builtin.fail:

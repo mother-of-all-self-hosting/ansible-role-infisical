@@ -97,11 +97,11 @@ infisical_frontend_systemd_required_systemd_services_list_default: ['docker.serv
 infisical_frontend_systemd_required_systemd_services_list_auto: []
 infisical_frontend_systemd_required_systemd_services_list_custom: []
 
-# infisical_frontend_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the frontend container.
+# infisical__container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the frontend container.
 # See `../templates/frontend/labels.j2` for details.
 #
 # To inject your own other container labels, see `infisical_frontend_container_labels_additional_labels`.
-infisical_frontend_container_labels_traefik_enabled: true
+infisical__container_labels_traefik_enabled: true
 infisical_frontend_container_labels_traefik_docker_network: "{{ infisical_container_network }}"
 infisical_frontend_container_labels_traefik_hostname: "{{ infisical_hostname }}"
 # The path prefix must either be `/` or not end with a slash (e.g. `/infisical`).
