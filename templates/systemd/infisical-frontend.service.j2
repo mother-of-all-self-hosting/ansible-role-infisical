@@ -5,8 +5,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Infisical Frontend ({{ infisical_identifier }}-frontend)
-{% for service in infisical_frontend_systemd_required_services_list %}
+Description=Infisical  ({{ infisical_identifier }})
+{% for service in infisical__systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
 {% endfor %}
@@ -15,8 +15,8 @@ DefaultDependencies=no
 [Service]
 Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ infisical_identifier }}-frontend 2>/dev/null || true'
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }}-frontend 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ infisical_identifier }}- 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }}- 2>/dev/null || true'
 
 {#
   Intentionally not doing any of these:
@@ -28,34 +28,34 @@ ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_s
 #}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ infisical_identifier }}-frontend \
+      --name={{ infisical_identifier }}- \
       --log-driver=none \
       --network={{ infisical_container_network }} \
-      {% if infisical_frontend_container_http_bind_port %}
-      -p {{ infisical_frontend_container_http_bind_port }}:3000 \
+      {% if infisical__container_http_bind_port %}
+      -p {{ infisical__container_http_bind_port }}:3000 \
       {% endif %}
-      --env-file={{ infisical_frontend_path }}/env \
-      --label-file={{ infisical_frontend_path }}/labels \
-      {% for volume in infisical_frontend_container_additional_volumes %}
+      --env-file={{ infisical__path }}/env \
+      --label-file={{ infisical__path }}/labels \
+      {% for volume in infisical__container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
       {% endfor %}
-      {% for arg in infisical_frontend_container_extra_arguments %}
+      {% for arg in infisical__container_extra_arguments %}
       {{ arg }} \
       {% endfor %}
-      {{ infisical_frontend_container_image }}
+      {{ infisical__container_image }}
 
-{% for network in infisical_frontend_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ infisical_identifier }}-frontend
+{% for network in infisical__container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ infisical_identifier }}-
 {% endfor %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ infisical_identifier }}-frontend
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ infisical_identifier }}-
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ infisical_identifier }}-frontend 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }}-frontend 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ infisical_identifier }}- 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }}- 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ infisical_identifier }}-frontend
+SyslogIdentifier={{ infisical_identifier }}-
 
 [Install]
 WantedBy=multi-user.target
