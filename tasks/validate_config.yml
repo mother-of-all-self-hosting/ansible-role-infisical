@@ -24,11 +24,11 @@
     - infisical_hostname
     - infisical_path_prefix
     - infisical_container_network
-    - infisical__environment_variable_encryption_key
-    - infisical__environment_variable_jwt_signup_secret
-    - infisical__environment_variable_jwt_refresh_secret
-    - infisical__environment_variable_jwt_auth_secret
-    - infisical__environment_variable_jwt_service_secret
+    - infisical_environment_variable_encryption_key
+    - infisical_environment_variable_jwt_signup_secret
+    - infisical_environment_variable_jwt_refresh_secret
+    - infisical_environment_variable_jwt_auth_secret
+    - infisical_environment_variable_jwt_service_secret
     - infisical_mongodb_username
     - infisical_mongodb_password
     - infisical_mongodb_hostname
