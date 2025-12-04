@@ -26,7 +26,7 @@ infisical_hostname: ''
 infisical_path_prefix: /
 
 infisical_base_path: "/{{ infisical_identifier }}"
-infisical_frontend_path: "{{ infisical_base_path }}/frontend"
+infisical_path: "{{ infisical_base_path }}/frontend"
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 infisical_container_network: "{{ infisical_identifier }}"
@@ -38,47 +38,47 @@ infisical_container_additional_networks: "{{ infisical_container_additional_netw
 infisical_container_additional_networks_auto: []
 infisical_container_additional_networks_custom: []
 
-infisical_frontend_container_image: "{{ infisical_container_image_registry_prefix }}infisical:{{ infisical_frontend_container_image_tag }}"
-infisical_frontend_container_image_registry_prefix: docker.io/
-infisical_frontend_container_image_tag: "{{ infisical_version }}"
-infisical_frontend_container_image_force_pull: "{{ infisical_frontend_container_image.endswith(':latest') }}"
+infisical_container_image: "{{ infisical_container_image_registry_prefix }}infisical:{{ infisical_container_image_tag }}"
+infisical_container_image_registry_prefix: docker.io/
+infisical_container_image_tag: "{{ infisical_version }}"
+infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':latest') }}"
 
-infisical_frontend_container_network: "{{ infisical_container_network }}"
+infisical_container_network: "{{ infisical_container_network }}"
 
 # A list of additional container networks that the frontend container would be connected to.
 # The role does not create these networks, so make sure they already exist.
 # Use this to expose this container to another reverse proxy, which runs in a different container network.
-infisical_frontend_container_additional_networks: "{{ infisical_frontend_container_additional_networks_auto + infisical_frontend_container_additional_networks_custom }}"
-infisical_frontend_container_additional_networks_auto: "{{ infisical_container_additional_networks_auto }}"
-infisical_frontend_container_additional_networks_custom: "{{ infisical_container_additional_networks_custom }}"
+infisical_container_additional_networks: "{{ infisical_container_additional_networks_auto + infisical_container_additional_networks_custom }}"
+infisical_container_additional_networks_auto: "{{ infisical_container_additional_networks_auto }}"
+infisical_container_additional_networks_custom: "{{ infisical_container_additional_networks_custom }}"
 
 # Specifies how the frontend container publishes its HTTP port
 #
 # Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
-infisical_frontend_container_http_bind_port: ''
+infisical_container_http_bind_port: ''
 
-# infisical_frontend_container_labels_additional_labels contains a multiline string with additional labels to add to the frontend container label file.
+# infisical_container_labels_additional_labels contains a multiline string with additional labels to add to the frontend container label file.
 # See `../templates/frontend/labels.j2` for details.
 #
 # Example:
-# infisical_frontend_container_labels_additional_labels: |
+# infisical_container_labels_additional_labels: |
 #   my.label=1
 #   another.label="here"
-infisical_frontend_container_labels_additional_labels: ''
+infisical_container_labels_additional_labels: ''
 
 # Controls the TELEMETRY_ENABLED environment variable for the frontend service
-infisical_frontend_environment_variable_telemetry_enabled: false
+infisical_environment_variable_telemetry_enabled: false
 
 # Additional environment variables for the frontend container.
 # To discover available options, see: https://infisical.com/docs/self-hosting/configuration/envars
-infisical_frontend_environment_variables_additional_variables: ''
+infisical_environment_variables_additional_variables: ''
 
 # A list of additional "volumes" to mount in the frontend container.
 #
 # See the `--mount` documentation for the `docker run` command.
 #
 # Example:
-# infisical_frontend_container_additional_volumes:
+# infisical_container_additional_volumes:
 #   - type: bind
 #     src: /path/on/the/host
 #     dst: /data
@@ -86,51 +86,51 @@ infisical_frontend_environment_variables_additional_variables: ''
 #     src: /another-path/on/the/host
 #     dst: /read-only
 #     options: readonly
-infisical_frontend_container_additional_volumes: []
+infisical_container_additional_volumes: []
 
 # A list of extra arguments to pass to the frontend container
-infisical_frontend_container_extra_arguments: []
+infisical_container_extra_arguments: []
 
-# List of systemd services that infisical-frontend.service depends on
-infisical_frontend_systemd_required_services_list: "{{ infisical_frontend_systemd_required_systemd_services_list_default + infisical_frontend_systemd_required_systemd_services_list_auto + infisical_frontend_systemd_required_systemd_services_list_custom }}"
-infisical_frontend_systemd_required_systemd_services_list_default: ['docker.service']
-infisical_frontend_systemd_required_systemd_services_list_auto: []
-infisical_frontend_systemd_required_systemd_services_list_custom: []
+# List of systemd services that infisical.service depends on
+infisical_systemd_required_services_list: "{{ infisical_systemd_required_systemd_services_list_default + infisical_systemd_required_systemd_services_list_auto + infisical_systemd_required_systemd_services_list_custom }}"
+infisical_systemd_required_systemd_services_list_default: ['docker.service']
+infisical_systemd_required_systemd_services_list_auto: []
+infisical_systemd_required_systemd_services_list_custom: []
 
-# infisical__container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the frontend container.
+# infisical_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the frontend container.
 # See `../templates/frontend/labels.j2` for details.
 #
-# To inject your own other container labels, see `infisical_frontend_container_labels_additional_labels`.
-infisical__container_labels_traefik_enabled: true
-infisical_frontend_container_labels_traefik_docker_network: "{{ infisical_container_network }}"
-infisical_frontend_container_labels_traefik_hostname: "{{ infisical_hostname }}"
+# To inject your own other container labels, see `infisical_container_labels_additional_labels`.
+infisical_container_labels_traefik_enabled: true
+infisical_container_labels_traefik_docker_network: "{{ infisical_container_network }}"
+infisical_container_labels_traefik_hostname: "{{ infisical_hostname }}"
 # The path prefix must either be `/` or not end with a slash (e.g. `/infisical`).
-infisical_frontend_container_labels_traefik_path_prefix: "{{ infisical_path_prefix }}"
-infisical_frontend_container_labels_traefik_rule: "Host(`{{ infisical_frontend_container_labels_traefik_hostname }}`){% if infisical_frontend_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ infisical_frontend_container_labels_traefik_path_prefix }}`){% endif %}"
-infisical_frontend_container_labels_traefik_priority: 0
-infisical_frontend_container_labels_traefik_entrypoints: web-secure
-infisical_frontend_container_labels_traefik_tls: "{{ infisical_frontend_container_labels_traefik_entrypoints != 'web' }}"
-infisical_frontend_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+infisical_container_labels_traefik_path_prefix: "{{ infisical_path_prefix }}"
+infisical_container_labels_traefik_rule: "Host(`{{ infisical_container_labels_traefik_hostname }}`){% if infisical_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ infisical_container_labels_traefik_path_prefix }}`){% endif %}"
+infisical_container_labels_traefik_priority: 0
+infisical_container_labels_traefik_entrypoints: web-secure
+infisical_container_labels_traefik_tls: "{{ infisical_container_labels_traefik_entrypoints != 'web' }}"
+infisical_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
 # Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `infisical_frontend_container_labels_traefik_additional_request_headers_custom`
-infisical_frontend_container_labels_traefik_additional_request_headers: "{{ infisical_frontend_container_labels_traefik_additional_request_headers_auto | combine(infisical_frontend_container_labels_traefik_additional_request_headers_custom) }}"
-infisical_frontend_container_labels_traefik_additional_request_headers_auto: {}
-infisical_frontend_container_labels_traefik_additional_request_headers_custom: {}
+# To add your own custom request headers, use `infisical_container_labels_traefik_additional_request_headers_custom`
+infisical_container_labels_traefik_additional_request_headers: "{{ infisical_container_labels_traefik_additional_request_headers_auto | combine(infisical_container_labels_traefik_additional_request_headers_custom) }}"
+infisical_container_labels_traefik_additional_request_headers_auto: {}
+infisical_container_labels_traefik_additional_request_headers_custom: {}
 
 # Controls which additional headers to attach to all HTTP responses.
-# To add your own custom response headers, use `infisical_frontend_container_labels_traefik_additional_response_headers_custom`
-infisical_frontend_container_labels_traefik_additional_response_headers: "{{ infisical_frontend_container_labels_traefik_additional_response_headers_auto | combine(infisical_frontend_container_labels_traefik_additional_response_headers_custom) }}"
-infisical_frontend_container_labels_traefik_additional_response_headers_auto: |
+# To add your own custom response headers, use `infisical_container_labels_traefik_additional_response_headers_custom`
+infisical_container_labels_traefik_additional_response_headers: "{{ infisical_container_labels_traefik_additional_response_headers_auto | combine(infisical_container_labels_traefik_additional_response_headers_custom) }}"
+infisical_container_labels_traefik_additional_response_headers_auto: |
   {{
     {}
     | combine ({'X-XSS-Protection': infisical_http_header_xss_protection} if infisical_http_header_xss_protection else {})
     | combine ({'X-Content-Type-Options': infisical_http_header_content_type_options} if infisical_http_header_content_type_options else {})
     | combine ({'Content-Security-Policy': infisical_http_header_content_security_policy} if infisical_http_header_content_security_policy else {})
     | combine ({'Permissions-Policy': infisical_http_header_permissions_policy} if infisical_http_header_permissions_policy else {})
-    | combine ({'Strict-Transport-Security': infisical_http_header_strict_transport_security} if infisical_http_header_strict_transport_security and infisical_frontend_container_labels_traefik_tls else {})
+    | combine ({'Strict-Transport-Security': infisical_http_header_strict_transport_security} if infisical_http_header_strict_transport_security and infisical_container_labels_traefik_tls else {})
   }}
-infisical_frontend_container_labels_traefik_additional_response_headers_custom: {}
+infisical_container_labels_traefik_additional_response_headers_custom: {}
 
 # Specifies the value of the `X-XSS-Protection` header
 # Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
