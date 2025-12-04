@@ -33,7 +33,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --log-driver=none \
       --network={{ infisical_container_network }} \
       {% if infisical_container_http_bind_port %}
-      -p {{ infisical_container_http_bind_port }}:3000 \
+      -p {{ infisical_container_http_bind_port }}:8080 \
       {% endif %}
       --env-file={{ infisical_path }}/env \
       --label-file={{ infisical_path }}/labels \
