@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2025 Neokyx
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -26,7 +27,7 @@ infisical_hostname: ''
 infisical_path_prefix: /
 
 infisical_base_path: "/{{ infisical_identifier }}"
-infisical_path: "{{ infisical_base_path }}/frontend"
+infisical_path: "{{ infisical_base_path }}/"
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 infisical_container_network: "{{ infisical_identifier }}"
@@ -45,20 +46,20 @@ infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':l
 
 infisical_container_network: "{{ infisical_container_network }}"
 
-# A list of additional container networks that the frontend container would be connected to.
+# A list of additional container networks that the  container would be connected to.
 # The role does not create these networks, so make sure they already exist.
 # Use this to expose this container to another reverse proxy, which runs in a different container network.
 infisical_container_additional_networks: "{{ infisical_container_additional_networks_auto + infisical_container_additional_networks_custom }}"
 infisical_container_additional_networks_auto: "{{ infisical_container_additional_networks_auto }}"
 infisical_container_additional_networks_custom: "{{ infisical_container_additional_networks_custom }}"
 
-# Specifies how the frontend container publishes its HTTP port
+# Specifies how the  container publishes its HTTP port
 #
 # Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
 infisical_container_http_bind_port: ''
 
-# infisical_container_labels_additional_labels contains a multiline string with additional labels to add to the frontend container label file.
-# See `../templates/frontend/labels.j2` for details.
+# infisical_container_labels_additional_labels contains a multiline string with additional labels to add to the  container label file.
+# See `../templates//labels.j2` for details.
 #
 # Example:
 # infisical_container_labels_additional_labels: |
@@ -66,14 +67,14 @@ infisical_container_http_bind_port: ''
 #   another.label="here"
 infisical_container_labels_additional_labels: ''
 
-# Controls the TELEMETRY_ENABLED environment variable for the frontend service
+# Controls the TELEMETRY_ENABLED environment variable for the  service
 infisical_environment_variable_telemetry_enabled: false
 
-# Additional environment variables for the frontend container.
+# Additional environment variables for the  container.
 # To discover available options, see: https://infisical.com/docs/self-hosting/configuration/envars
 infisical_environment_variables_additional_variables: ''
 
-# A list of additional "volumes" to mount in the frontend container.
+# A list of additional "volumes" to mount in the  container.
 #
 # See the `--mount` documentation for the `docker run` command.
 #
@@ -88,7 +89,7 @@ infisical_environment_variables_additional_variables: ''
 #     options: readonly
 infisical_container_additional_volumes: []
 
-# A list of extra arguments to pass to the frontend container
+# A list of extra arguments to pass to the  container
 infisical_container_extra_arguments: []
 
 # List of systemd services that infisical.service depends on
@@ -97,8 +98,8 @@ infisical_systemd_required_systemd_services_list_default: ['docker.service']
 infisical_systemd_required_systemd_services_list_auto: []
 infisical_systemd_required_systemd_services_list_custom: []
 
-# infisical_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the frontend container.
-# See `../templates/frontend/labels.j2` for details.
+# infisical_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the  container.
+# See `../templates//labels.j2` for details.
 #
 # To inject your own other container labels, see `infisical_container_labels_additional_labels`.
 infisical_container_labels_traefik_enabled: true
