@@ -44,15 +44,6 @@ infisical_container_image_registry_prefix: docker.io/
 infisical_container_image_tag: "{{ infisical_version }}"
 infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':latest') }}"
 
-infisical_container_network: "{{ infisical_container_network }}"
-
-# A list of additional container networks that the  container would be connected to.
-# The role does not create these networks, so make sure they already exist.
-# Use this to expose this container to another reverse proxy, which runs in a different container network.
-infisical_container_additional_networks: "{{ infisical_container_additional_networks_auto + infisical_container_additional_networks_custom }}"
-infisical_container_additional_networks_auto: "{{ infisical_container_additional_networks_auto }}"
-infisical_container_additional_networks_custom: "{{ infisical_container_additional_networks_custom }}"
-
 # Specifies how the  container publishes its HTTP port
 #
 # Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
