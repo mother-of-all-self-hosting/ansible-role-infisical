@@ -28,6 +28,12 @@
     - src: /labels.j2
       dst: "{{ infisical_path }}/labels"
 
+- name: Ensure Infisical systemd service is present
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates//systemd/infisical.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
+    mode: "0644"
+
 - name: Ensure Infisical container image is pulled via community.docker.docker_image
   when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
   community.docker.docker_image:
@@ -56,10 +62,3 @@
     driver: bridge
   with_items:
     - "{{ infisical_container_network }}"
-
-- name: Ensure Infisical systemd service is present
-  ansible.builtin.template:
-    src: "{{ role_path }}/templates//systemd/infisical.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
-    mode: "0644"
-
