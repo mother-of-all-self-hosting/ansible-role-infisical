@@ -74,6 +74,12 @@
           pull: true
           args:
 
+- name: Ensure An Infisical systemd service is present
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/systemd/infisical.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
+    mode: "0644"
+
 - name: Ensure An Infisical container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
   community.docker.docker_network:
@@ -93,9 +99,3 @@
   register: network_creation_result
   changed_when: network_creation_result.rc == 0
   failed_when: network_creation_result.rc != 0 and 'already exists' not in network_creation_result.stderr
-
-- name: Ensure An Infisical systemd service is present
-  ansible.builtin.template:
-    src: "{{ role_path }}/templates/systemd/infisical.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
-    mode: "0644"
