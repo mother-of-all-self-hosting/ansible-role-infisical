@@ -41,7 +41,8 @@ infisical_container_additional_networks_custom: []
 
 infisical_container_image_registry_prefix: docker.io/
 infisical_container_image_tag: "{{ infisical_version }}"
-infisical_container_image: "{{ infisical_container_image_registry_prefix }}infisical/infisical:{{ infisical_container_image_tag }}"
+#infisical_container_image: "{{ infisical_container_image_registry_prefix }}infisical/infisical:{{ infisical_container_image_tag }}"
+infisical_container_image: "docker.io/infisical/infisical:{{ infisical_version }}"
 infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':latest') }}"
 
 # Specifies how the  container publishes its HTTP port
