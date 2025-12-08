@@ -62,4 +62,3 @@
     src: "{{ role_path }}/templates//systemd/infisical.service.j2"
     dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
     mode: "0644"
-
