@@ -48,7 +48,6 @@ infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':l
 #
 # Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
 infisical_container_http_bind_port: ''
-
 # infisical_container_labels_additional_labels contains a multiline string with additional labels to add to the  container label file.
 # See `../templates/labels.j2` for details.
 #
@@ -57,7 +56,6 @@ infisical_container_http_bind_port: ''
 #   my.label=1  
 #   another.label="here"
 infisical_container_labels_additional_labels: ''
-
 # Controls the TELEMETRY_ENABLED environment variable for the  service
 infisical_environment_variable_telemetry_enabled: false
 
