@@ -25,6 +25,7 @@
     - infisical_hostname
     - infisical_path_prefix
     - infisical_container_network
+    - infisical_container_image
     - infisical_environment_variable_encryption_key
     - infisical_environment_variable_jwt_signup_secret
     - infisical_environment_variable_jwt_refresh_secret
