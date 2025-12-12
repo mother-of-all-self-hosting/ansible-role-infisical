@@ -5,7 +5,7 @@
 
 ---
 
-# Project source code URL: https://github.com/Infisical/infisical
+# Project source code URL: https://github.com/infisical/infisical
 
 infisical_enabled: true
 
@@ -15,6 +15,7 @@ infisical_uid: ''
 infisical_gid: ''
 
 # renovate: datasource=docker depName=infisical/infisical
+
 infisical_version: v0.154.4
 
 infisical_scheme: https
@@ -27,7 +28,7 @@ infisical_hostname: ''
 infisical_path_prefix: /
 
 infisical_base_path: "/{{ infisical_identifier }}"
-infisical_path: "{{ infisical_base_path }}/"
+infisical_path: "{{ infisical_base_path }}"
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 infisical_container_network: "{{ infisical_identifier }}"
@@ -39,9 +40,12 @@ infisical_container_additional_networks: "{{ infisical_container_additional_netw
 infisical_container_additional_networks_auto: []
 infisical_container_additional_networks_custom: []
 
+infisical_container_image: "{{ infisical_container_image_registry_prefix }}infisical/infisical:{{ infisical_container_image_tag }}"
+
 infisical_container_image_registry_prefix: docker.io/
+
 infisical_container_image_tag: "{{ infisical_version }}"
-infisical_container_image: "docker.io/infisical/infisical:{{ infisical_container_image_tag }}"
+
 infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':latest') }}"
 
 # Specifies how the container publishes its HTTP port
