@@ -39,7 +39,7 @@ infisical_container_additional_networks: "{{ infisical_container_additional_netw
 infisical_container_additional_networks_auto: []
 infisical_container_additional_networks_custom: []
 
-infisical_container_image_registry_prefix: docker.io/infisical
+infisical_container_image_registry_prefix: docker.io/infisical/
 infisical_container_image_tag: "{{ infisical_version }}"
 infisical_container_image: "{{ infisical_container_image_registry_prefix }}/infisical:{{ infisical_container_image_tag }}"
 infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':latest') }}"

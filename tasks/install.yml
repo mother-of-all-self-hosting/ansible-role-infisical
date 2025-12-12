@@ -18,8 +18,8 @@
 
 - name: Ensure an Infisical support files installed
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/{{ item }}.j2"
-    dest: "{{ infisical_base_path }}/{{ item }}"
+    src: "{{ role_path }}/templates{{ item }}.j2"
+    dest: "{{ infisical_base_path }}{{ item }}"
     mode: "0640"
     owner: "{{ infisical_uid }}"
     group: "{{ infisical_gid }}"
