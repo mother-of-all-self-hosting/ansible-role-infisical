@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Ensure An Infisical paths exist
+- name: Ensure an Infisical paths exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -16,7 +16,7 @@
     - "{{ infisical_base_path }}"
     - "{{ infisical_data_path }}"
 
-- name: Ensure An Infisical support files installed
+- name: Ensure an Infisical support files installed
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"
     dest: "{{ infisical_base_path }}/{{ item }}"
@@ -27,10 +27,10 @@
     - env
     - labels
 
-- name: Run if self-building of An Infisical container image is not enabled
+- name: Run if self-building of an Infisical container image is not enabled
   when: "not infisical_container_image_self_build | bool"
   block:
-    - name: Ensure An Infisical container image is pulled via community.docker.docker_image
+    - name: Ensure an Infisical container image is pulled via community.docker.docker_image
       when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
       community.docker.docker_image:
         name: "{{ infisical_container_image }}"
@@ -42,28 +42,27 @@
       delay: "{{ devture_playbook_help_container_retries_delay }}"
       until: result is not failed
 
-    - name: Ensure An Infisical container image is pulled via ansible.builtin.command
+    - name: Ensure an Infisical container image is pulled via ansible.builtin.command
       when: devture_systemd_docker_base_container_image_pull_method == 'command'
       ansible.builtin.command:
-#        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical_container_image }}"
-        cmd: "docker pull docker.io/infisical/infisical:v0.154.4"
+        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical_container_image }}"
       register: result
       retries: "{{ devture_playbook_help_container_retries_count }}"
       delay: "{{ devture_playbook_help_container_retries_delay }}"
       until: result is not failed
       changed_when: "'Downloaded newer image' in result.stdout"
 
-- name: Run if self-building of An Infisical container image is enabled
+- name: Run if self-building of an Infisical container image is enabled
   when: "infisical_container_image_self_build | bool"
   block:
-    - name: Ensure An Infisical repository is present on self-build
+    - name: Ensure an Infisical repository is present on self-build
       ansible.builtin.git:
         repo: "{{ infisical_container_image_self_build_repo }}"
         version: "{{ infisical_container_image_self_build_repo_version }}"
         dest: "{{ infisical_container_image_self_build_src_files_path }}"
         force: "yes"
       register: infisical_git_pull_results
-    - name: Ensure An Infisical container image is built
+    - name: Ensure an Infisical container image is built
       community.docker.docker_image:
         name: "{{ infisical_container_image_self_build_name }}"
         source: build
@@ -75,13 +74,13 @@
           pull: true
           args:
 
-- name: Ensure An Infisical systemd service is present
+- name: Ensure an Infisical systemd service is present
   ansible.builtin.template:
     src: "{{ role_path }}/templates/systemd/infisical.service.j2"
     dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
     mode: "0644"
 
-- name: Ensure An Infisical container network is created via community.docker.docker_network
+- name: Ensure an Infisical container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
   community.docker.docker_network:
     enable_ipv6: "{{ devture_systemd_docker_base_ipv6_enabled }}"
@@ -89,14 +88,14 @@
     driver: bridge
     driver_options: "{{ devture_systemd_docker_base_container_networks_driver_options }}"
 
-- name: Ensure An Infisical container network is created via ansible.builtin.command
+- name: Ensure an Infisical container network is created via ansible.builtin.command
   when: devture_systemd_docker_base_container_network_creation_method == 'command'
   ansible.builtin.command:
-    cmd: >-
+    cmd: ">-
       {{ devture_systemd_docker_base_host_command_docker }} network create
       {% if devture_systemd_docker_base_ipv6_enabled %}--ipv6{% endif %}
       {{ devture_systemd_docker_base_container_networks_driver_options_string }}
-      {{ infisical_container_network }}
+      {{ infisical_container_network }}"
   register: network_creation_result
   changed_when: network_creation_result.rc == 0
   failed_when: network_creation_result.rc != 0 and 'already exists' not in network_creation_result.stderr

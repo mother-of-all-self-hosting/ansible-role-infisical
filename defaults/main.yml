@@ -14,7 +14,7 @@ infisical_identifier: infisical
 infisical_uid: ''
 infisical_gid: ''
 
-# renovate: datasource=docker depName=infisical/
+# renovate: datasource=docker depName=infisical/infisical
 infisical_version: v0.154.4
 
 infisical_scheme: https
@@ -44,17 +44,17 @@ infisical_container_image_tag: "{{ infisical_version }}"
 infisical_container_image: "{{ infisical_container_image_registry_prefix }}/infisical/infisical:{{ infisical_container_image_tag }}"
 infisical_container_image_force_pull: "{{ infisical_container_image.endswith(':latest') }}"
 
-# Specifies how the  container publishes its HTTP port
+# Specifies how the container publishes its HTTP port
 #
 # Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
 infisical_container_http_bind_port: ''
 
 # infisical_container_labels_additional_labels contains a multiline string with additional labels to add to the  container label file.
-# See `../templates//labels.j2` for details.
+# See `../templates/labels.j2` for details.
 #
 # Example:
 # infisical_container_labels_additional_labels: |
-#   my.label=1
+#   my.label=1  
 #   another.label="here"
 infisical_container_labels_additional_labels: ''
 
