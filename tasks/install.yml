@@ -45,7 +45,8 @@
     - name: Ensure An Infisical container image is pulled via ansible.builtin.command
       when: devture_systemd_docker_base_container_image_pull_method == 'command'
       ansible.builtin.command:
-        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical_container_image }}"
+#        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical_container_image }}"
+        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull docker.io/infisical/infisical:v0.154.4"
       register: result
       retries: "{{ devture_playbook_help_container_retries_count }}"
       delay: "{{ devture_playbook_help_container_retries_delay }}"
