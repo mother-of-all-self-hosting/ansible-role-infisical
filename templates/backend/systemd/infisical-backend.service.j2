@@ -34,7 +34,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% for volume in infisical_backend_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
       {% endfor %}
-      --tmpfs=/.npm:rw,noexec,nosuid,size=128m \
+      --tmpfs=/.npm:rw,noexec,nosuid,size={{ infisical_backend_container_tmpfs_dotnpm_size }} \
       {% for arg in infisical_backend_container_extra_arguments %}
       {{ arg }} \
       {% endfor %}

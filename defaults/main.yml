@@ -164,6 +164,9 @@ infisical_backend_environment_variables_additional_variables: ''
 #     options: readonly
 infisical_backend_container_additional_volumes: []
 
+# Specify the size of the container's tmpfs volume (/.npm)
+infisical_backend_container_tmpfs_dotnpm_size: 128m
+
 # A list of extra arguments to pass to the backend container
 infisical_backend_container_extra_arguments: []
 
