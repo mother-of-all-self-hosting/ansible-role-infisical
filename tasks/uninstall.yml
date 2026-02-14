@@ -24,6 +24,7 @@
       community.docker.docker_network:
         name: "{{ infisical_backend_container_network }}"
         state: absent
+      register: infisical_backend_network_deletion_result
 
     - name: Ensure Infisical backend container network does not exist via ansible.builtin.command
       when: devture_systemd_docker_base_container_network_creation_method == 'command'
@@ -31,8 +32,8 @@
         cmd: >-
           {{ devture_systemd_docker_base_host_command_docker }} network rm
           {{ infisical_backend_container_network }}
-      register: network_deletion_result
-      changed_when: infisical_backend_container_network in network_deletion_result.stdout
+      register: infisical_backend_network_deletion_result
+      changed_when: infisical_backend_container_network in infisical_backend_network_deletion_result.stdout
 
     - name: Ensure Infisical backend systemd service does not exist
       ansible.builtin.file:
@@ -64,6 +65,7 @@
       community.docker.docker_network:
         name: "{{ infisical_frontend_container_network }}"
         state: absent
+      register: infisical_frontend_network_deletion_result
 
     - name: Ensure Infisical frontend container network does not exist via ansible.builtin.command
       when: devture_systemd_docker_base_container_network_creation_method == 'command'
@@ -71,8 +73,8 @@
         cmd: >-
           {{ devture_systemd_docker_base_host_command_docker }} network rm
           {{ infisical_frontend_container_network }}
-      register: network_deletion_result
-      changed_when: infisical_frontend_container_network in network_deletion_result.stdout
+      register: infisical_frontend_network_deletion_result
+      changed_when: infisical_frontend_container_network in infisical_frontend_network_deletion_result.stdout
 
     - name: Ensure Infisical path does not exist
       ansible.builtin.file:
