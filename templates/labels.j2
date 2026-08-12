@@ -5,62 +5,62 @@ SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
-{% if teable_container_labels_traefik_enabled %}
+{% if infisical_container_labels_traefik_enabled %}
 traefik.enable=true
 
-{% if teable_container_labels_traefik_docker_network %}
-traefik.docker.network={{ teable_container_labels_traefik_docker_network }}
+{% if infisical_container_labels_traefik_docker_network %}
+traefik.docker.network={{ infisical_container_labels_traefik_docker_network }}
 {% endif %}
 
 {% set middlewares = [] %}
 
-{% if teable_container_labels_traefik_middleware_basic_auth_enabled %}
-{% set middlewares = middlewares + [teable_identifier + '-basic-auth'] %}
-traefik.http.middlewares.{{ teable_identifier }}-basic-auth.basicauth.users={{ teable_container_labels_traefik_middleware_basic_auth_users }}
+{% if infisical_container_labels_traefik_middleware_basic_auth_enabled %}
+{% set middlewares = middlewares + [infisical_identifier + '-basic-auth'] %}
+traefik.http.middlewares.{{ infisical_identifier }}-basic-auth.basicauth.users={{ infisical_container_labels_traefik_middleware_basic_auth_users }}
 {% endif %}
 
-{% if teable_container_labels_traefik_path_prefix != '/' %}
-traefik.http.middlewares.{{ teable_identifier }}-slashless-redirect.redirectregex.regex=^({{ teable_container_labels_traefik_path_prefix | quote }})$
-traefik.http.middlewares.{{ teable_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
-{% set middlewares = middlewares + [teable_identifier + '-slashless-redirect'] %}
+{% if infisical_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ infisical_identifier }}-slashless-redirect.redirectregex.regex=^({{ infisical_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ infisical_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [infisical_identifier + '-slashless-redirect'] %}
 {% endif %}
 
-{% if teable_container_labels_traefik_path_prefix != '/' %}
-traefik.http.middlewares.{{ teable_identifier }}-strip-prefix.stripprefix.prefixes={{ teable_container_labels_traefik_path_prefix }}
-{% set middlewares = middlewares + [teable_identifier + '-strip-prefix'] %}
+{% if infisical_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ infisical_identifier }}-strip-prefix.stripprefix.prefixes={{ infisical_container_labels_traefik_path_prefix }}
+{% set middlewares = middlewares + [infisical_identifier + '-strip-prefix'] %}
 {% endif %}
 
-{% if teable_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
-{% for name, value in teable_container_labels_traefik_additional_request_headers.items() %}
-traefik.http.middlewares.{{ teable_identifier }}-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
+{% if infisical_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
+{% for name, value in infisical_container_labels_traefik_additional_request_headers.items() %}
+traefik.http.middlewares.{{ infisical_identifier }}-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
 {% endfor %}
-{% set middlewares = middlewares + [teable_identifier + '-add-request-headers'] %}
+{% set middlewares = middlewares + [infisical_identifier + '-add-request-headers'] %}
 {% endif %}
 
-{% if teable_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
-{% for name, value in teable_container_labels_traefik_additional_response_headers.items() %}
-traefik.http.middlewares.{{ teable_identifier }}-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
+{% if infisical_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
+{% for name, value in infisical_container_labels_traefik_additional_response_headers.items() %}
+traefik.http.middlewares.{{ infisical_identifier }}-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
 {% endfor %}
-{% set middlewares = middlewares + [teable_identifier + '-add-response-headers'] %}
+{% set middlewares = middlewares + [infisical_identifier + '-add-response-headers'] %}
 {% endif %}
 
-traefik.http.routers.{{ teable_identifier }}.rule={{ teable_container_labels_traefik_rule }}
-{% if teable_container_labels_traefik_priority | int > 0 %}
-traefik.http.routers.{{ teable_identifier }}.priority={{ teable_container_labels_traefik_priority }}
+traefik.http.routers.{{ infisical_identifier }}.rule={{ infisical_container_labels_traefik_rule }}
+{% if infisical_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ infisical_identifier }}.priority={{ infisical_container_labels_traefik_priority }}
 {% endif %}
-traefik.http.routers.{{ teable_identifier }}.service={{ teable_identifier }}
+traefik.http.routers.{{ infisical_identifier }}.service={{ infisical_identifier }}
 {% if middlewares | length > 0 %}
-traefik.http.routers.{{ teable_identifier }}.middlewares={{ middlewares | join(',') }}
+traefik.http.routers.{{ infisical_identifier }}.middlewares={{ middlewares | join(',') }}
 {% endif %}
-traefik.http.routers.{{ teable_identifier }}.entrypoints={{ teable_container_labels_traefik_entrypoints }}
-traefik.http.routers.{{ teable_identifier }}.tls={{ teable_container_labels_traefik_tls | to_json }}
-{% if teable_container_labels_traefik_tls %}
-traefik.http.routers.{{ teable_identifier }}.tls.certResolver={{ teable_container_labels_traefik_tls_certResolver }}
-{% endif %}
-
-traefik.http.services.{{ teable_identifier }}.loadbalancer.server.port={{ teable_container_http_port }}
+traefik.http.routers.{{ infisical_identifier }}.entrypoints={{ infisical_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ infisical_identifier }}.tls={{ infisical_container_labels_traefik_tls | to_json }}
+{% if infisical_container_labels_traefik_tls %}
+traefik.http.routers.{{ infisical_identifier }}.tls.certResolver={{ infisical_container_labels_traefik_tls_certResolver }}
 {% endif %}
 
-{% for arg in teable_container_labels_additional_labels %}
+traefik.http.services.{{ infisical_identifier }}.loadbalancer.server.port={{ infisical_container_http_port }}
+{% endif %}
+
+{% for arg in infisical_container_labels_additional_labels %}
 {{ arg }}
 {% endfor %}

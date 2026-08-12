@@ -47,15 +47,15 @@ Currently these testing scenarios are available:
 
 ### `default`
 
-Tests a standard Teable installation with the Postgres database.
+Tests a standard Infisical installation with the Postgres database.
 
 ### `default-valkey`
 
-Tests a standard Teable installation with the Postgres database and the Valkey data-store.
+Tests a standard Infisical installation with the Postgres database and the Valkey data-store.
 
 ### `mariadb`
 
-Tests a standard Teable installation with the MariaDB database.
+Tests a standard Infisical installation with the MariaDB database.
 
 ## Running
 

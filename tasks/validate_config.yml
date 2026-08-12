@@ -14,47 +14,47 @@
   with_items:
     - { "old": "infisical_http_header_content_permission_policy", "new": "infisical_http_header_permissions_policy" }
 
-- name: Fail if required Teable settings not defined
+- name: Fail if required Infisical settings not defined
   ansible.builtin.fail:
     msg: >-
       You need to define a required configuration setting (`{{ item }}`).
   when: "lookup('vars', item, default='') | string | length == 0"
   with_items:
-    - teable_uid
-    - teable_gid
-    - teable_hostname
-    - teable_path_prefix
-    - teable_container_network
-    - teable_database_hostname
-    - teable_database_password
-    - teable_redis_hostname
-    - teable_environment_variables_secret_key
+    - infisical_uid
+    - infisical_gid
+    - infisical_hostname
+    - infisical_path_prefix
+    - infisical_container_network
+    - infisical_database_hostname
+    - infisical_database_password
+    - infisical_redis_hostname
+    - infisical_environment_variables_secret_key
 
 - name: Run if Traefik is enabled
-  when: teable_container_labels_traefik_enabled | bool
+  when: infisical_container_labels_traefik_enabled | bool
   block:
-    - name: Fail if Traefik settings required for Teable are not defined
+    - name: Fail if Traefik settings required for Infisical are not defined
       ansible.builtin.fail:
         msg: >-
           You need to define a required configuration setting (`{{ item.name }}`).
       when: "item.when | bool and lookup('vars', item.name, default='') | string | length == 0"
       with_items:
-        - { "name": "teable_container_labels_traefik_hostname", when: true }
-        - { "name": "teable_container_labels_traefik_path_prefix", when: true }
-        - { "name": "teable_container_labels_traefik_middleware_basic_auth_users", when: "{{ teable_container_labels_traefik_middleware_basic_auth_enabled }}" }
+        - { "name": "infisical_container_labels_traefik_hostname", when: true }
+        - { "name": "infisical_container_labels_traefik_path_prefix", when: true }
+        - { "name": "infisical_container_labels_traefik_middleware_basic_auth_users", when: "{{ infisical_container_labels_traefik_middleware_basic_auth_enabled }}" }
 
-    - name: Fail if teable_container_labels_traefik_path_prefix is different than /
+    - name: Fail if infisical_container_labels_traefik_path_prefix is different than /
       ansible.builtin.fail:
         msg: >-
-          teable_container_labels_traefik_path_prefix (`{{ teable_container_labels_traefik_path_prefix }}`) must be `/`.
-          Teable does not support hosting under a subpath yet.
-      when: "teable_container_labels_traefik_path_prefix != '/'"
+          infisical_container_labels_traefik_path_prefix (`{{ infisical_container_labels_traefik_path_prefix }}`) must be `/`.
+          Infisical does not support hosting under a subpath yet.
+      when: "infisical_container_labels_traefik_path_prefix != '/'"
 
     # We ensure it doesn't end with a slash, because we handle both (slash and no-slash).
-    # Knowing that `teable_container_labels_traefik_path_prefix` does not end with a slash
+    # Knowing that `infisical_container_labels_traefik_path_prefix` does not end with a slash
     # ensures we know how to set these routes up without having to do "does it end with a slash" checks elsewhere.
-    - name: Fail if teable_container_labels_traefik_path_prefix ends with a slash
+    - name: Fail if infisical_container_labels_traefik_path_prefix ends with a slash
       ansible.builtin.fail:
         msg: >-
-          teable_container_labels_traefik_path_prefix (`{{ teable_container_labels_traefik_path_prefix }}`) must either be `/` or not end with a slash (e.g. `/teable`).
-      when: "teable_container_labels_traefik_path_prefix != '/' and teable_container_labels_traefik_path_prefix[-1] == '/'"
+          infisical_container_labels_traefik_path_prefix (`{{ infisical_container_labels_traefik_path_prefix }}`) must either be `/` or not end with a slash (e.g. `/infisical`).
+      when: "infisical_container_labels_traefik_path_prefix != '/' and infisical_container_labels_traefik_path_prefix[-1] == '/'"

@@ -7,124 +7,124 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-# Project source code URL: https://github.com/teableio/teable
+# Project source code URL: https://github.com/infisicalio/infisical
 
-teable_enabled: true
+infisical_enabled: true
 
-teable_identifier: teable
-teable_base_path: "/{{ teable_identifier }}"
-teable_data_path: "{{ teable_base_path }}/data"
+infisical_identifier: infisical
+infisical_base_path: "/{{ infisical_identifier }}"
+infisical_data_path: "{{ infisical_base_path }}/data"
 
-teable_version: latest
+infisical_version: latest
 
-# Teable runs only as root
-teable_uid: "0"
-teable_gid: "0"
+# Infisical runs only as root
+infisical_uid: "0"
+infisical_gid: "0"
 
-# The scheme used for serving Teable.
-teable_scheme: https
+# The scheme used for serving Infisical.
+infisical_scheme: https
 
-# The hostname at which Teable is served.
-teable_hostname: ""
+# The hostname at which Infisical is served.
+infisical_hostname: ""
 
-# The path at which Teable is served.
-# This value must either be `/` or not end with a slash (e.g. `/teable`).
+# The path at which Infisical is served.
+# This value must either be `/` or not end with a slash (e.g. `/infisical`).
 #
-# Hosting Teable under a subpath does not seem to be possible due to Teable's
+# Hosting Infisical under a subpath does not seem to be possible due to Infisical's
 # technical limitations.
-teable_path_prefix: /
+infisical_path_prefix: /
 
-teable_container_image: "{{ teable_container_image_registry_prefix }}teableio/teable-community:{{ teable_container_image_tag }}"
-teable_container_image_tag: "{{ teable_version }}"
-teable_container_image_registry_prefix: "{{ teable_container_image_registry_prefix_upstream }}"
-teable_container_image_registry_prefix_upstream: "{{ teable_container_image_registry_prefix_upstream_default }}"
-teable_container_image_registry_prefix_upstream_default: docker.io/
+infisical_container_image: "{{ infisical_container_image_registry_prefix }}infisicalio/infisical-community:{{ infisical_container_image_tag }}"
+infisical_container_image_tag: "{{ infisical_version }}"
+infisical_container_image_registry_prefix: "{{ infisical_container_image_registry_prefix_upstream }}"
+infisical_container_image_registry_prefix_upstream: "{{ infisical_container_image_registry_prefix_upstream_default }}"
+infisical_container_image_registry_prefix_upstream_default: docker.io/
 # TODO: add tasks to self-build the image
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
-teable_container_network: "{{ teable_identifier }}"
+infisical_container_network: "{{ infisical_identifier }}"
 
 # Control if the container network is deleted on uninstalling.
-teable_container_network_deletion_enabled: true
+infisical_container_network_deletion_enabled: true
 
-# Specify how the container publishes its HTTP port (as defined by `teable_container_http_port`).
+# Specify how the container publishes its HTTP port (as defined by `infisical_container_http_port`).
 #
 # Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
-teable_container_http_host_bind_port: ""
+infisical_container_http_host_bind_port: ""
 
 # The port number in the container
-teable_container_http_port: 3000
+infisical_container_http_port: 3000
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
 # Use this to expose this container to another reverse proxy, which runs in a different container network.
-teable_container_additional_networks: "{{ teable_container_additional_networks_auto + teable_container_additional_networks_custom }}"
-teable_container_additional_networks_auto: []
-teable_container_additional_networks_custom: []
+infisical_container_additional_networks: "{{ infisical_container_additional_networks_auto + infisical_container_additional_networks_custom }}"
+infisical_container_additional_networks_auto: []
+infisical_container_additional_networks_custom: []
 
 # A list of additional "volumes" to mount in the container.
 # This list gets populated dynamically at runtime. You can provide a different default value,
 # if you wish to mount your own files into the container.
 # Contains definition objects like this: `{"type": "bind", "src": "/outside", "dst": "/inside", "options": "readonly"}.
 # See the `--mount` documentation for the `docker run` command.
-teable_container_additional_volumes: "{{ teable_container_additional_volumes_auto + teable_container_additional_volumes_custom }}"
-teable_container_additional_volumes_auto: []
-teable_container_additional_volumes_custom: []
+infisical_container_additional_volumes: "{{ infisical_container_additional_volumes_auto + infisical_container_additional_volumes_custom }}"
+infisical_container_additional_volumes_auto: []
+infisical_container_additional_volumes_custom: []
 
-# teable_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# infisical_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
 # See `../templates/labels.j2` for details.
 #
-# To inject your own other container labels, see `teable_container_labels_additional_labels_custom`.
-teable_container_labels_traefik_enabled: true
-teable_container_labels_traefik_docker_network: "{{ teable_container_network }}"
-teable_container_labels_traefik_hostname: "{{ teable_hostname }}"
-# The path prefix must either be `/` or not end with a slash (e.g. `/teable`).
-teable_container_labels_traefik_path_prefix: "{{ teable_path_prefix }}"
-teable_container_labels_traefik_rule: "Host(`{{ teable_container_labels_traefik_hostname }}`){% if teable_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ teable_container_labels_traefik_path_prefix }}`){% endif %}"
-teable_container_labels_traefik_priority: 0
-teable_container_labels_traefik_entrypoints: web-secure
-teable_container_labels_traefik_tls: "{{ teable_container_labels_traefik_entrypoints != 'web' }}"
-teable_container_labels_traefik_tls_certResolver: default  # noqa var-naming
-teable_container_labels_traefik_middleware_basic_auth_enabled: false
+# To inject your own other container labels, see `infisical_container_labels_additional_labels_custom`.
+infisical_container_labels_traefik_enabled: true
+infisical_container_labels_traefik_docker_network: "{{ infisical_container_network }}"
+infisical_container_labels_traefik_hostname: "{{ infisical_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/infisical`).
+infisical_container_labels_traefik_path_prefix: "{{ infisical_path_prefix }}"
+infisical_container_labels_traefik_rule: "Host(`{{ infisical_container_labels_traefik_hostname }}`){% if infisical_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ infisical_container_labels_traefik_path_prefix }}`){% endif %}"
+infisical_container_labels_traefik_priority: 0
+infisical_container_labels_traefik_entrypoints: web-secure
+infisical_container_labels_traefik_tls: "{{ infisical_container_labels_traefik_entrypoints != 'web' }}"
+infisical_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+infisical_container_labels_traefik_middleware_basic_auth_enabled: false
 # See: https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/basicauth/
-teable_container_labels_traefik_middleware_basic_auth_users: ""
+infisical_container_labels_traefik_middleware_basic_auth_users: ""
 
 # Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `teable_container_labels_traefik_additional_request_headers_custom`
-teable_container_labels_traefik_additional_request_headers: "{{ teable_container_labels_traefik_additional_request_headers_auto | combine(teable_container_labels_traefik_additional_request_headers_custom) }}"
-teable_container_labels_traefik_additional_request_headers_auto: {}
-teable_container_labels_traefik_additional_request_headers_custom: {}
+# To add your own custom request headers, use `infisical_container_labels_traefik_additional_request_headers_custom`
+infisical_container_labels_traefik_additional_request_headers: "{{ infisical_container_labels_traefik_additional_request_headers_auto | combine(infisical_container_labels_traefik_additional_request_headers_custom) }}"
+infisical_container_labels_traefik_additional_request_headers_auto: {}
+infisical_container_labels_traefik_additional_request_headers_custom: {}
 
 # Controls which additional headers to attach to all HTTP responses.
-# To add your own custom response headers, use `teable_container_labels_traefik_additional_response_headers_custom`
-teable_container_labels_traefik_additional_response_headers: "{{ teable_container_labels_traefik_additional_response_headers_auto | combine(teable_container_labels_traefik_additional_response_headers_custom) }}"
-teable_container_labels_traefik_additional_response_headers_auto: |
+# To add your own custom response headers, use `infisical_container_labels_traefik_additional_response_headers_custom`
+infisical_container_labels_traefik_additional_response_headers: "{{ infisical_container_labels_traefik_additional_response_headers_auto | combine(infisical_container_labels_traefik_additional_response_headers_custom) }}"
+infisical_container_labels_traefik_additional_response_headers_auto: |
   {{
     {}
-    | combine ({'X-XSS-Protection': teable_http_header_xss_protection} if teable_http_header_xss_protection else {})
-    | combine ({'X-Content-Type-Options': teable_http_header_content_type_options} if teable_http_header_content_type_options else {})
-    | combine ({'Content-Security-Policy': teable_http_header_content_security_policy} if teable_http_header_content_security_policy else {})
-    | combine ({'Permissions-Policy': teable_http_header_permissions_policy} if teable_http_header_permissions_policy else {})
-    | combine ({'Strict-Transport-Security': teable_http_header_strict_transport_security} if teable_http_header_strict_transport_security and teable_container_labels_traefik_tls else {})
+    | combine ({'X-XSS-Protection': infisical_http_header_xss_protection} if infisical_http_header_xss_protection else {})
+    | combine ({'X-Content-Type-Options': infisical_http_header_content_type_options} if infisical_http_header_content_type_options else {})
+    | combine ({'Content-Security-Policy': infisical_http_header_content_security_policy} if infisical_http_header_content_security_policy else {})
+    | combine ({'Permissions-Policy': infisical_http_header_permissions_policy} if infisical_http_header_permissions_policy else {})
+    | combine ({'Strict-Transport-Security': infisical_http_header_strict_transport_security} if infisical_http_header_strict_transport_security and infisical_container_labels_traefik_tls else {})
   }}
-teable_container_labels_traefik_additional_response_headers_custom: {}
+infisical_container_labels_traefik_additional_response_headers_custom: {}
 
-# teable_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# infisical_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
 # See `../templates/labels.j2` for details.
-# To add your own custom labels, use `teable_container_labels_additional_labels_custom`
+# To add your own custom labels, use `infisical_container_labels_additional_labels_custom`
 #
 # Example:
-# teable_container_labels_additional_labels_custom:
+# infisical_container_labels_additional_labels_custom:
 #   - my.label=1
 #   - another.label="here"
-teable_container_labels_additional_labels: "{{ teable_container_labels_additional_labels_auto + teable_container_labels_additional_labels_custom }}"
-teable_container_labels_additional_labels_auto: []
-teable_container_labels_additional_labels_custom: []
+infisical_container_labels_additional_labels: "{{ infisical_container_labels_additional_labels_auto + infisical_container_labels_additional_labels_custom }}"
+infisical_container_labels_additional_labels_auto: []
+infisical_container_labels_additional_labels_custom: []
 
 # A list of extra arguments to pass to the container (`docker create` command)
-teable_container_extra_arguments: "{{ teable_container_extra_arguments_auto + teable_container_extra_arguments_custom }}"
-teable_container_extra_arguments_auto: []
-teable_container_extra_arguments_custom: []
+infisical_container_extra_arguments: "{{ infisical_container_extra_arguments_auto + infisical_container_extra_arguments_custom }}"
+infisical_container_extra_arguments_auto: []
+infisical_container_extra_arguments_custom: []
 
 # Specifies the value of the `X-XSS-Protection` header
 # Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
@@ -132,23 +132,23 @@ teable_container_extra_arguments_custom: []
 # Learn more about it is here:
 # - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 # - https://portswigger.net/web-security/cross-site-scripting/reflected
-teable_http_header_xss_protection: "1; mode=block"
+infisical_http_header_xss_protection: "1; mode=block"
 
 # Specifies the value of the `X-Content-Type-Options` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-teable_http_header_content_type_options: nosniff
+infisical_http_header_content_type_options: nosniff
 
 # Specifies the value of the `Content-Security-Policy` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-teable_http_header_content_security_policy: frame-ancestors 'self'
+infisical_http_header_content_security_policy: frame-ancestors 'self'
 
 # Specifies the value of the `Permissions-Policy` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
-teable_http_header_permissions_policy: "{{ 'interest-cohort=()' if teable_floc_optout_enabled else '' }}"
+infisical_http_header_permissions_policy: "{{ 'interest-cohort=()' if infisical_floc_optout_enabled else '' }}"
 
 # Specifies the value of the `Strict-Transport-Security` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
-teable_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if teable_hsts_preload_enabled else '' }}"
+infisical_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if infisical_hsts_preload_enabled else '' }}"
 
 # Controls whether to send a "Permissions-Policy interest-cohort=();" header along with all responses
 #
@@ -158,8 +158,8 @@ teable_http_header_strict_transport_security: "max-age=31536000; includeSubDomai
 # - https://amifloced.org/
 #
 # Of course, a better solution is to just stop using browsers (like Chrome), which participate in such tracking practices.
-# See: `teable_http_header_permissions_policy`
-teable_floc_optout_enabled: true
+# See: `infisical_http_header_permissions_policy`
+infisical_floc_optout_enabled: true
 
 # Controls if HSTS preloading is enabled
 #
@@ -170,93 +170,93 @@ teable_floc_optout_enabled: true
 # - https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
 # - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
 # - https://hstspreload.org/#opt-in
-# See: `teable_http_header_strict_transport_security`
-teable_hsts_preload_enabled: false
+# See: `infisical_http_header_strict_transport_security`
+infisical_hsts_preload_enabled: false
 
-# List of systemd services that the Teable systemd service depends on
-teable_systemd_required_services_list: "{{ teable_systemd_required_services_list_default + teable_systemd_required_services_list_auto + teable_systemd_required_services_list_custom }}"
-teable_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
-teable_systemd_required_services_list_auto: []
-teable_systemd_required_services_list_custom: []
+# List of systemd services that the Infisical systemd service depends on
+infisical_systemd_required_services_list: "{{ infisical_systemd_required_services_list_default + infisical_systemd_required_services_list_auto + infisical_systemd_required_services_list_custom }}"
+infisical_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
+infisical_systemd_required_services_list_auto: []
+infisical_systemd_required_services_list_custom: []
 
-# List of systemd services that the Teable systemd service wants
-teable_systemd_wanted_services_list: "{{ teable_systemd_wanted_services_list_default + teable_systemd_wanted_services_list_auto + teable_systemd_wanted_services_list_custom }}"
-teable_systemd_wanted_services_list_default: []
-teable_systemd_wanted_services_list_auto: []
-teable_systemd_wanted_services_list_custom: []
+# List of systemd services that the Infisical systemd service wants
+infisical_systemd_wanted_services_list: "{{ infisical_systemd_wanted_services_list_default + infisical_systemd_wanted_services_list_auto + infisical_systemd_wanted_services_list_custom }}"
+infisical_systemd_wanted_services_list_default: []
+infisical_systemd_wanted_services_list_auto: []
+infisical_systemd_wanted_services_list_custom: []
 
 # Controls `TimeoutSec` value on the n8n systemd service
 # Setting an empty value respects the default one
-teable_systemd_docker_base_timeout_sec: ""
+infisical_systemd_docker_base_timeout_sec: ""
 
 # Controls how long to wait for the container to stop gracefully before killing it.
-teable_container_stop_grace_time_seconds: "{{ devture_systemd_docker_base_container_stop_grace_time_seconds }}"
+infisical_container_stop_grace_time_seconds: "{{ devture_systemd_docker_base_container_stop_grace_time_seconds }}"
 
 # Controls how long the pre-start cleanup should wait for stale container-name release
 # before failing startup explicitly.
-teable_container_cleanup_timeout_seconds: "{{ devture_systemd_docker_base_container_cleanup_timeout_seconds }}"
+infisical_container_cleanup_timeout_seconds: "{{ devture_systemd_docker_base_container_cleanup_timeout_seconds }}"
 
 # Controls the delay between pre-start cleanup retries.
-teable_container_cleanup_retry_delay_seconds: "{{ devture_systemd_docker_base_container_cleanup_retry_delay_seconds }}"
+infisical_container_cleanup_retry_delay_seconds: "{{ devture_systemd_docker_base_container_cleanup_retry_delay_seconds }}"
 
 # Shell command used in the systemd pre-start phase to deterministically remove a stale
 # container and wait until Docker releases its name.
-teable_container_cleanup_command: |
+infisical_container_cleanup_command: |
   i=0;
-  while [ "$i" -lt {{ teable_container_cleanup_timeout_seconds }} ]; do
-  {{ devture_systemd_docker_base_host_command_docker }} stop -t {{ teable_container_stop_grace_time_seconds }} {{ teable_identifier }} >/dev/null 2>&1 || true;
-  {{ devture_systemd_docker_base_host_command_docker }} rm -f {{ teable_identifier }} >/dev/null 2>&1 || true;
-  if {{ devture_systemd_docker_base_host_command_docker }} container inspect {{ teable_identifier }} >/dev/null 2>&1; then
+  while [ "$i" -lt {{ infisical_container_cleanup_timeout_seconds }} ]; do
+  {{ devture_systemd_docker_base_host_command_docker }} stop -t {{ infisical_container_stop_grace_time_seconds }} {{ infisical_identifier }} >/dev/null 2>&1 || true;
+  {{ devture_systemd_docker_base_host_command_docker }} rm -f {{ infisical_identifier }} >/dev/null 2>&1 || true;
+  if {{ devture_systemd_docker_base_host_command_docker }} container inspect {{ infisical_identifier }} >/dev/null 2>&1; then
   i=$((i + 1));
-  sleep {{ teable_container_cleanup_retry_delay_seconds }};
+  sleep {{ infisical_container_cleanup_retry_delay_seconds }};
   continue;
   fi;
   if {{ devture_systemd_docker_base_host_command_docker }} info >/dev/null 2>&1; then
   exit 0;
   fi;
-  echo "Failed to query Docker daemon while cleaning up {{ teable_identifier }}" >&2;
+  echo "Failed to query Docker daemon while cleaning up {{ infisical_identifier }}" >&2;
   exit 1;
   done;
-  echo "Failed to remove stale container {{ teable_identifier }} after {{ teable_container_cleanup_timeout_seconds }} attempts" >&2;
+  echo "Failed to remove stale container {{ infisical_identifier }} after {{ infisical_container_cleanup_timeout_seconds }} attempts" >&2;
   exit 1
 
 # Specify database configuration
-teable_database_hostname: ""
-teable_database_port: 5432
-teable_database_username: teable
-teable_database_password: ""
+infisical_database_hostname: ""
+infisical_database_port: 5432
+infisical_database_username: infisical
+infisical_database_password: ""
 # Specify SSL mode for Postgres database server
 # By default, we expect a local container (without SSL), so attempting SSL connections is not necessary.
 # Valid values: see https://www.postgresql.org/docs/11/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS
-teable_database_sslmode: disable
-teable_database_name: teable
+infisical_database_sslmode: disable
+infisical_database_name: infisical
 
 # Specify configuration for Redis or Valkey server
-teable_redis_hostname: ""
-teable_redis_port: 6379
-teable_redis_database: 0
+infisical_redis_hostname: ""
+infisical_redis_port: 6379
+infisical_redis_database: 0
 
 # Specify the timezone
-teable_environment_variables_tz: UTC
+infisical_environment_variables_tz: UTC
 
 # Specify a random string used for session management, etc.
 # generated with `pwgen -s 64 1` or in another way.
-teable_environment_variables_secret_key: ""
+infisical_environment_variables_secret_key: ""
 
 # Valid values: fatal, error, warn, info, debug, trace
-teable_environment_variables_loglevel: info
+infisical_environment_variables_loglevel: info
 
 # Control if loading third-party images is allowed
-teable_environment_variables_teable_next_env_images_all_remote: false
+infisical_environment_variables_infisical_next_env_images_all_remote: false
 
 # Control if secure session cookie is enabled
-teable_environment_variables_backend_session_cookie_secure: true
+infisical_environment_variables_backend_session_cookie_secure: true
 
 # Additional environment variables.
-# See: https://help.teable.ai/en/deploy/env
-teable_environment_variables_additional_variables: ""
+# See: https://help.infisical.ai/en/deploy/env
+infisical_environment_variables_additional_variables: ""
 
-# teable_restart_necessary controls whether the Teable systemd
+# infisical_restart_necessary controls whether the Infisical systemd
 # service will be restarted (when true) or merely started (when false) by the
 # systemd service manager role (when conditional restart is enabled).
 #
@@ -264,4 +264,4 @@ teable_environment_variables_additional_variables: ""
 # any configuration files, the systemd service file, or the container image changed.
 # The default of `false` means "no restart needed" — appropriate when the role's
 # installation tasks haven't run (e.g., due to --tags skipping them).
-teable_restart_necessary: false
+infisical_restart_necessary: false

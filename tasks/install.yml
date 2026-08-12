@@ -4,83 +4,83 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Ensure Teable paths exist
+- name: Ensure Infisical paths exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: "0750"
-    owner: "{{ teable_uid }}"
-    group: "{{ teable_gid }}"
+    owner: "{{ infisical_uid }}"
+    group: "{{ infisical_gid }}"
   with_items:
-    - "{{ teable_base_path }}"
-    - "{{ teable_data_path }}"
+    - "{{ infisical_base_path }}"
+    - "{{ infisical_data_path }}"
 
-- name: Ensure Teable support files installed
+- name: Ensure Infisical support files installed
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"
-    dest: "{{ teable_base_path }}/{{ item }}"
+    dest: "{{ infisical_base_path }}/{{ item }}"
     mode: "0640"
-    owner: "{{ teable_uid }}"
-    group: "{{ teable_gid }}"
+    owner: "{{ infisical_uid }}"
+    group: "{{ infisical_gid }}"
   with_items:
     - env
     - labels
-  register: teable_support_files_result
+  register: infisical_support_files_result
 
-- name: Ensure Teable container image is pulled via community.docker.docker_image_pull
+- name: Ensure Infisical container image is pulled via community.docker.docker_image_pull
   when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
   community.docker.docker_image_pull:
-    name: "{{ teable_container_image }}"
+    name: "{{ infisical_container_image }}"
     pull: always
-  register: teable_container_image_pull_result_ansible_module
+  register: infisical_container_image_pull_result_ansible_module
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: teable_container_image_pull_result_ansible_module is not failed
+  until: infisical_container_image_pull_result_ansible_module is not failed
 
-- name: Ensure Teable container image is pulled via ansible.builtin.command
+- name: Ensure Infisical container image is pulled via ansible.builtin.command
   when: devture_systemd_docker_base_container_image_pull_method == 'command'
   ansible.builtin.command:
-    cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ teable_container_image }}"
-  register: teable_container_image_pull_result_command
+    cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ infisical_container_image }}"
+  register: infisical_container_image_pull_result_command
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: teable_container_image_pull_result_command is not failed
-  changed_when: "'Downloaded newer image' in teable_container_image_pull_result_command.stdout"
+  until: infisical_container_image_pull_result_command is not failed
+  changed_when: "'Downloaded newer image' in infisical_container_image_pull_result_command.stdout"
 
-- name: Ensure Teable container network is created via community.docker.docker_network
+- name: Ensure Infisical container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
   community.docker.docker_network:
     enable_ipv6: "{{ devture_systemd_docker_base_ipv6_enabled }}"
-    name: "{{ teable_container_network }}"
+    name: "{{ infisical_container_network }}"
     driver: bridge
     driver_options: "{{ devture_systemd_docker_base_container_networks_driver_options }}"
-  register: teable_network_creation_result
+  register: infisical_network_creation_result
 
-- name: Ensure Teable container network is created via ansible.builtin.command
+- name: Ensure Infisical container network is created via ansible.builtin.command
   when: devture_systemd_docker_base_container_network_creation_method == 'command'
   ansible.builtin.command:
     cmd: >-
       {{ devture_systemd_docker_base_host_command_docker }} network create
       {% if devture_systemd_docker_base_ipv6_enabled %}--ipv6{% endif %}
       {{ devture_systemd_docker_base_container_networks_driver_options_string }}
-      {{ teable_container_network }}
-  register: teable_network_creation_result
-  changed_when: teable_network_creation_result.rc == 0
-  failed_when: teable_network_creation_result.rc != 0 and 'already exists' not in teable_network_creation_result.stderr
+      {{ infisical_container_network }}
+  register: infisical_network_creation_result
+  changed_when: infisical_network_creation_result.rc == 0
+  failed_when: infisical_network_creation_result.rc != 0 and 'already exists' not in infisical_network_creation_result.stderr
 
-- name: Ensure Teable systemd service is present
+- name: Ensure Infisical systemd service is present
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/systemd/teable.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ teable_identifier }}.service"
+    src: "{{ role_path }}/templates/systemd/infisical.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
     mode: "0644"
-  register: teable_systemd_service_result
+  register: infisical_systemd_service_result
 
-- name: Determine whether Teable needs a restart
+- name: Determine whether Infisical needs a restart
   ansible.builtin.set_fact:
-    teable_restart_necessary: >-
+    infisical_restart_necessary: >-
       {{
-        teable_support_files_result.changed | default(false)
-        or teable_systemd_service_result.changed | default(false)
-        or teable_container_image_pull_result_ansible_module.changed | default(false)
-        or teable_container_image_pull_result_command.changed | default(false)
+        infisical_support_files_result.changed | default(false)
+        or infisical_systemd_service_result.changed | default(false)
+        or infisical_container_image_pull_result_ansible_module.changed | default(false)
+        or infisical_container_image_pull_result_command.changed | default(false)
       }}

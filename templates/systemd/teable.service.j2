@@ -7,12 +7,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Teable ({{ teable_identifier }})
-{% for service in teable_systemd_required_services_list %}
+Description=Infisical ({{ infisical_identifier }})
+{% for service in infisical_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
 {% endfor %}
-{% for service in teable_systemd_wanted_services_list %}
+{% for service in infisical_systemd_wanted_services_list %}
 Wants={{ service }}
 {% endfor %}
 DefaultDependencies=no
@@ -20,46 +20,46 @@ DefaultDependencies=no
 [Service]
 Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
-ExecStartPre={{ devture_systemd_docker_base_host_command_sh }} -c '{{ teable_container_cleanup_command | trim | replace("\n", " ") }}'
+ExecStartPre={{ devture_systemd_docker_base_host_command_sh }} -c '{{ infisical_container_cleanup_command | trim | replace("\n", " ") }}'
 
 {#
-  Teable runs only as root with writable filesystem, requires capabilities too.
+  Infisical runs only as root with writable filesystem, requires capabilities too.
 #}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ teable_identifier }} \
+      --name={{ infisical_identifier }} \
       --log-driver=none \
-      --user={{ teable_uid }}:{{ teable_gid }} \
-      --network={{ teable_container_network }} \
-      {% if teable_container_http_host_bind_port %}
-      -p {{ teable_container_http_host_bind_port }}:{{ teable_container_http_port }} \
+      --user={{ infisical_uid }}:{{ infisical_gid }} \
+      --network={{ infisical_container_network }} \
+      {% if infisical_container_http_host_bind_port %}
+      -p {{ infisical_container_http_host_bind_port }}:{{ infisical_container_http_port }} \
       {% endif %}
-      --env-file={{ teable_base_path }}/env \
-      --label-file={{ teable_base_path }}/labels \
-      --mount type=bind,src={{ teable_data_path }},dst=/app/.assets \
-      {% for volume in teable_container_additional_volumes %}
+      --env-file={{ infisical_base_path }}/env \
+      --label-file={{ infisical_base_path }}/labels \
+      --mount type=bind,src={{ infisical_data_path }},dst=/app/.assets \
+      {% for volume in infisical_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
       {% endfor %}
-      {% for arg in teable_container_extra_arguments %}
+      {% for arg in infisical_container_extra_arguments %}
       {{ arg }} \
       {% endfor %}
-      {{ teable_container_image }}
+      {{ infisical_container_image }}
 
-{% for network in teable_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ teable_identifier }}
+{% for network in infisical_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ infisical_identifier }}
 {% endfor %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ teable_identifier }}
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ infisical_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ teable_identifier }} 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ teable_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ infisical_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ infisical_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ teable_identifier }}
+SyslogIdentifier={{ infisical_identifier }}
 
-{% if teable_systemd_docker_base_timeout_sec != '' %}
-TimeoutSec={{ teable_systemd_docker_base_timeout_sec }}
+{% if infisical_systemd_docker_base_timeout_sec != '' %}
+TimeoutSec={{ infisical_systemd_docker_base_timeout_sec }}
 {% endif %}
 
 [Install]

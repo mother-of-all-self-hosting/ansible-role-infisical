@@ -1,27 +1,26 @@
 # SPDX-FileCopyrightText: 2023 Slavi Pantaleev
-# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Perform Teable installation tasks
-  when: teable_enabled | bool
+- name: Perform Infisical installation tasks
+  when: infisical_enabled | bool
   tags:
     - setup-all
-    - setup-teable
+    - setup-infisical
     - install-all
-    - install-teable
+    - install-infisical
   block:
-    - name: Validate Teable configuration
+    - name: Validate Infisical configuration
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
-    - name: Install Teable
+    - name: Install Infisical
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
-- name: Perform Teable uninstallation tasks
-  when: not teable_enabled | bool
+- name: Perform Infisical uninstallation tasks
+  when: not infisical_enabled | bool
   tags:
     - setup-all
-    - setup-teable
+    - setup-infisical
   block:
-    - name: Uninstall Teable
+    - name: Uninstall Infisical
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"

@@ -2,9 +2,9 @@
 galaxy_info:
   author: Suguru Hirahara
   company: progressiv
-  role_name: teable
+  role_name: infisical
   namespace: progressiv
-  description: Teable
+  description: Infisical
   platforms:
     - name: Debian
       versions:

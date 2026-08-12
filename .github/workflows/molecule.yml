@@ -32,25 +32,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7.0.0
         with:
-          path: teable
+          path: infisical
 
       - name: Set up Python
         uses: actions/setup-python@v6.3.0
         with:
-          python-version-file: teable/.python-version
+          python-version-file: infisical/.python-version
           cache: pip
-          cache-dependency-path: teable/molecule/requirements.txt
+          cache-dependency-path: infisical/molecule/requirements.txt
 
       - name: Install Python dependencies
-        working-directory: teable
+        working-directory: infisical
         run: pip install -r molecule/requirements.txt
 
       - name: Cache Ansible collections
         uses: actions/cache@v6.1.0
         with:
           path: ~/.ansible/collections
-          key: ansible-collections-${{ hashFiles('teable/molecule/default/requirements.yml') }}
+          key: ansible-collections-${{ hashFiles('infisical/molecule/default/requirements.yml') }}
 
       - name: Run Molecule
-        working-directory: teable
+        working-directory: infisical
         run: molecule test --scenario-name ${{ matrix.scenario }}

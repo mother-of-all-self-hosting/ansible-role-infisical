@@ -4,81 +4,81 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Check existence of Teable systemd service
+- name: Check existence of Infisical systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ teable_identifier }}.service"
-  register: teable_service_stat
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
+  register: infisical_service_stat
 
-- name: Uninstall Teable systemd services and files
-  when: teable_service_stat.stat.exists | bool
+- name: Uninstall Infisical systemd services and files
+  when: infisical_service_stat.stat.exists | bool
   block:
-    - name: Ensure Teable systemd service is stopped
+    - name: Ensure Infisical systemd service is stopped
       ansible.builtin.service:
-        name: "{{ teable_identifier }}"
+        name: "{{ infisical_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
-    - name: Ensure Teable systemd service does not exist
+    - name: Ensure Infisical systemd service does not exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ teable_identifier }}.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
         state: absent
 
-    - name: Ensure Teable support files do not exist
+    - name: Ensure Infisical support files do not exist
       ansible.builtin.file:
-        path: "{{ teable_base_path }}/{{ item }}"
+        path: "{{ infisical_base_path }}/{{ item }}"
         state: absent
       with_items:
         - env
         - labels
 
-    - name: Ensure Teable local data path does not exist if empty
+    - name: Ensure Infisical local data path does not exist if empty
       ansible.builtin.command:
-        cmd: "rmdir {{ teable_data_path }}"
-      register: teable_data_path_deletion_result
-      changed_when: teable_data_path_deletion_result.rc == 0
+        cmd: "rmdir {{ infisical_data_path }}"
+      register: infisical_data_path_deletion_result
+      changed_when: infisical_data_path_deletion_result.rc == 0
       failed_when: false
 
-    - name: Ensure Teable base path does not exist if empty
+    - name: Ensure Infisical base path does not exist if empty
       ansible.builtin.command:
-        cmd: "rmdir {{ teable_base_path }}"
-      register: teable_base_path_deletion_result
-      changed_when: teable_base_path_deletion_result.rc == 0
+        cmd: "rmdir {{ infisical_base_path }}"
+      register: infisical_base_path_deletion_result
+      changed_when: infisical_base_path_deletion_result.rc == 0
       failed_when: false
 
-    - name: Ensure Teable container network does not exist
-      when: teable_container_network_deletion_enabled
+    - name: Ensure Infisical container network does not exist
+      when: infisical_container_network_deletion_enabled
       block:
-        - name: Ensure Teable container network does not exist via community.docker.docker_network
+        - name: Ensure Infisical container network does not exist via community.docker.docker_network
           when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
           community.docker.docker_network:
-            name: "{{ teable_container_network }}"
+            name: "{{ infisical_container_network }}"
             state: absent
-          register: teable_network_deletion_result
+          register: infisical_network_deletion_result
 
-        - name: Ensure Teable container network does not exist via ansible.builtin.command
+        - name: Ensure Infisical container network does not exist via ansible.builtin.command
           when: devture_systemd_docker_base_container_network_creation_method == 'command'
           ansible.builtin.command:
             cmd: >-
               {{ devture_systemd_docker_base_host_command_docker }} network rm
-              {{ teable_container_network }}
-          register: teable_network_deletion_result
-          changed_when: teable_container_network in teable_network_deletion_result.stdout
+              {{ infisical_container_network }}
+          register: infisical_network_deletion_result
+          changed_when: infisical_container_network in infisical_network_deletion_result.stdout
 
-- name: Check existence of Teable local data path
+- name: Check existence of Infisical local data path
   ansible.builtin.stat:
-    path: "{{ teable_data_path }}"
-  register: teable_data_path_stat
+    path: "{{ infisical_data_path }}"
+  register: infisical_data_path_stat
 
 # We just want to notify the user. Deleting data is too destructive.
-- name: Inject the message about the remaining Teable local data path
-  when: teable_data_path_stat.stat.exists | bool
+- name: Inject the message about the remaining Infisical local data path
+  when: infisical_data_path_stat.stat.exists | bool
   ansible.builtin.set_fact:
     devture_playbook_runtime_messages_list: |
       {{
         devture_playbook_runtime_messages_list | default([])
         +
         [
-          "Note: As the local Teable instance has been removed, some old data remains in `" + teable_data_path + "`. Feel free to delete it."
+          "Note: As the local Infisical instance has been removed, some old data remains in `" + infisical_data_path + "`. Feel free to delete it."
         ]
       }}
