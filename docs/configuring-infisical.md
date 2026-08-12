@@ -161,11 +161,3 @@ To get started, open the URL with a web browser, and register the account. **Not
 ### Check the service's logs
 
 You can find the logs in [systemd-journald](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) by logging in to the server with SSH and running `journalctl -fu infisical` (or how you/your playbook named the service, e.g. `mash-infisical`).
-
-#### Increase logging verbosity
-
-If you want to increase the verbosity, add the following configuration to your `vars.yml` file:
-
-```yaml
-infisical_environment_variables_loglevel: debug
-```
