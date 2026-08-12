@@ -38,10 +38,13 @@ provisioner:
         infisical_hostname: localhost
         infisical_container_labels_traefik_enabled: false
         infisical_container_http_host_bind_port: 8080
+        infisical_container_metrics_host_bind_port: 9464
         infisical_environment_variables_encryption_key: 0fe35784ccbe01ef20c4fd4b07cc8503
         infisical_environment_variables_auth_secret: ZM1Lt/TGxQGBCFA9l0mm58EMY/g81DYLvXBfvhfdp0E=
         infisical_environment_variables_site_url: https://localhost:8080
         infisical_systemd_docker_base_timeout_sec: "5m"
+        infisical_environment_variables_otel_telemetry_collection_enabled: true
+        infisical_environment_variables_otel_export_type: prometheus
 
         # Variables required for Infisical to connect to the Postgres database
         infisical_database_hostname: "{{ postgres_connection_hostname }}"

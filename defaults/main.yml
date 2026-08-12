@@ -48,8 +48,16 @@ infisical_container_network_deletion_enabled: true
 # Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
 infisical_container_http_host_bind_port: ""
 
+# Specify how the metrics container publishes its HTTP port (as defined by `infisical_container_metrics_port`).
+#
+# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
+infisical_container_metrics_host_bind_port: ""
+
 # The port number in the container
 infisical_container_http_port: 8080
+
+# The port number of the metrics server in the container
+infisical_container_metrics_port: 9464
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
@@ -84,6 +92,21 @@ infisical_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 infisical_container_labels_traefik_middleware_basic_auth_enabled: false
 # See: https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/basicauth/
 infisical_container_labels_traefik_middleware_basic_auth_users: ""
+
+# Controls if labels are added to expose the Prometheus metrics publicly.
+infisical_container_labels_traefik_metrics_enabled: "{{ infisical_environment_variables_otel_telemetry_collection_enabled }}"
+infisical_container_labels_traefik_metrics_hostname: "{{ infisical_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/metrics`).
+infisical_container_labels_traefik_metrics_path_prefix: /metrics
+infisical_container_labels_traefik_metrics_rule: "Host(`{{ infisical_container_labels_traefik_metrics_hostname }}`){% if infisical_container_labels_traefik_metrics_path_prefix != '/' %} && PathPrefix(`{{ infisical_container_labels_traefik_metrics_path_prefix }}`){% endif %}"
+infisical_container_labels_traefik_metrics_priority: 0
+infisical_container_labels_traefik_metrics_entrypoints: "{{ infisical_container_labels_traefik_entrypoints }}"
+infisical_container_labels_traefik_metrics_middlewares: []
+infisical_container_labels_traefik_metrics_tls: "{{ infisical_container_labels_traefik_metrics_entrypoints != 'web' }}"
+infisical_container_labels_traefik_metrics_tls_certResolver: "{{ infisical_container_labels_traefik_tls_certResolver }}"  # noqa var-naming
+infisical_container_labels_traefik_metrics_middleware_basic_auth_enabled: false
+# See: https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/basicauth/
+infisical_container_labels_traefik_metrics_middleware_basic_auth_users: ""
 
 # Controls which additional headers to attach to all HTTP requests.
 # To add your own custom request headers, use `infisical_container_labels_traefik_additional_request_headers_custom`
@@ -257,6 +280,13 @@ infisical_environment_variables_smtp_password: ""
 infisical_environment_variables_smtp_from_address: ""
 infisical_environment_variables_smtp_ignore_tls: ""
 infisical_environment_variables_smtp_require_tls: ""
+
+# Control if metrics is allowed
+infisical_environment_variables_otel_telemetry_collection_enabled: false
+
+# Specify metrics type
+# Valid values: otlp, prometheus
+infisical_environment_variables_otel_export_type: ""
 
 # Additional environment variables.
 # See: https://infisical.com/docs/self-hosting/configuration/envars

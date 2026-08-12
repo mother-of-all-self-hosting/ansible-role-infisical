@@ -33,6 +33,9 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% if infisical_container_http_host_bind_port %}
       -p {{ infisical_container_http_host_bind_port }}:{{ infisical_container_http_port }} \
       {% endif %}
+      {% if infisical_container_metrics_host_bind_port %}
+      -p {{ infisical_container_metrics_host_bind_port }}:{{ infisical_container_metrics_port }} \
+      {% endif %}
       --env-file={{ infisical_base_path }}/env \
       --label-file={{ infisical_base_path }}/labels \
       {% for volume in infisical_container_additional_volumes %}

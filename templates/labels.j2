@@ -5,12 +5,14 @@ SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
-{% if infisical_container_labels_traefik_enabled %}
+{% if infisical_container_labels_traefik_enabled or infisical_container_labels_traefik_metrics_enabled %}
 traefik.enable=true
 
 {% if infisical_container_labels_traefik_docker_network %}
 traefik.docker.network={{ infisical_container_labels_traefik_docker_network }}
 {% endif %}
+
+{% if infisical_container_labels_traefik_enabled %}
 
 {% set middlewares = [] %}
 
@@ -59,6 +61,53 @@ traefik.http.routers.{{ infisical_identifier }}.tls.certResolver={{ infisical_co
 {% endif %}
 
 traefik.http.services.{{ infisical_identifier }}.loadbalancer.server.port={{ infisical_container_http_port }}
+{% endif %}
+
+{% if infisical_container_labels_traefik_metrics_enabled %}
+########################################################################
+#                                                                      #
+# Metrics                                                              #
+#                                                                      #
+########################################################################
+
+{% set middlewares = infisical_container_labels_traefik_metrics_middlewares %}
+
+{% if infisical_container_labels_traefik_metrics_middleware_basic_auth_enabled %}
+traefik.http.middlewares.{{ infisical_identifier }}-metrics-basic-auth.basicauth.users={{ infisical_container_labels_traefik_metrics_middleware_basic_auth_users }}
+{% set middlewares = middlewares + [infisical_identifier + '-metrics-basic-auth'] %}
+{% endif %}
+
+traefik.http.middlewares.{{ infisical_identifier }}-metrics-replace-path.replacepath.path=/metrics
+{% set middlewares = middlewares + [infisical_identifier + '-metrics-replace-path'] %}
+
+traefik.http.routers.{{ infisical_identifier }}-metrics.rule={{ infisical_container_labels_traefik_metrics_rule }}
+
+{% if infisical_container_labels_traefik_metrics_priority | int > 0 %}
+traefik.http.routers.{{ infisical_identifier }}-metrics.priority={{ infisical_container_labels_traefik_metrics_priority }}
+{% endif %}
+
+traefik.http.routers.{{ infisical_identifier }}-metrics.service={{ infisical_identifier }}-metrics
+
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ infisical_identifier }}-metrics.middlewares={{ middlewares | join(',') }}
+{% endif %}
+
+traefik.http.routers.{{ infisical_identifier }}-metrics.entrypoints={{ infisical_container_labels_traefik_metrics_entrypoints }}
+
+traefik.http.routers.{{ infisical_identifier }}-metrics.tls={{ infisical_container_labels_traefik_metrics_tls | to_json }}
+{% if infisical_container_labels_traefik_metrics_tls %}
+traefik.http.routers.{{ infisical_identifier }}-metrics.tls.certResolver={{ infisical_container_labels_traefik_metrics_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ infisical_identifier }}-metrics.loadbalancer.server.port={{ infisical_container_metrics_port }}
+
+########################################################################
+#                                                                      #
+# /Metrics                                                             #
+#                                                                      #
+########################################################################
+{% endif %}
+
 {% endif %}
 
 {% for arg in infisical_container_labels_additional_labels %}

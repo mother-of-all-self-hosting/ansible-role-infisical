@@ -46,8 +46,26 @@
         fail_msg: "Infisical did not respond as expected ({{ infisical_endpoint.status | default('no response') }})"
         success_msg: "Infisical responded with {{ infisical_endpoint.status }}"
 
+    - name: Wait for Infisical metrics HTTP endpoint to respond (up to 10m)
+      ansible.builtin.uri:
+        url: "http://localhost:9464/metrics"
+        method: GET
+        status_code: [200, 302, 307]
+        follow_redirects: none
+      register: infisical_endpoint_metrics
+      until: infisical_endpoint_metrics.status in [200, 302, 307]
+      retries: 120
+      delay: 5
+
+    - name: Assert Infisical metrics HTTP endpoint responds
+      ansible.builtin.assert:
+        that: infisical_endpoint_metrics.status in [200, 302, 307]
+        fail_msg: "Infisical metrics endpoint did not respond as expected ({{ infisical_endpoint_metrics.status | default('no response') }})"
+        success_msg: "Infisical metrics endpoint responded with {{ infisical_endpoint_metrics.status }}"
+
     - name: Show Infisical systemd service status summary
       ansible.builtin.debug:
         msg:
           - "Infisical systemd: {{ infisical_service.status.ActiveState }}"
           - "Infisical HTTP: {{ infisical_endpoint.status }}"
+          - "Infisical metrics HTTP: {{ infisical_endpoint_metrics.status }}"
