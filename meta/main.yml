@@ -1,10 +1,10 @@
 ---
 galaxy_info:
-  author: mash
-  company: mash
-  role_name: infisical
-  namespace: mash
-  description: Infisical
+  author: Suguru Hirahara
+  company: progressiv
+  role_name: teable
+  namespace: progressiv
+  description: Teable
   platforms:
     - name: Debian
       versions:
