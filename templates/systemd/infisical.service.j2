@@ -36,7 +36,6 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% endif %}
       --env-file={{ infisical_base_path }}/env \
       --label-file={{ infisical_base_path }}/labels \
-      --mount type=bind,src={{ infisical_data_path }},dst=/app/.assets \
       {% for volume in infisical_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
       {% endfor %}

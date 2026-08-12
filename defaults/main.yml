@@ -13,7 +13,6 @@ infisical_enabled: true
 
 infisical_identifier: infisical
 infisical_base_path: "/{{ infisical_identifier }}"
-infisical_data_path: "{{ infisical_base_path }}/data"
 
 infisical_version: latest
 

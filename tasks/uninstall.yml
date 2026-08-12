@@ -24,28 +24,6 @@
         path: "{{ devture_systemd_docker_base_systemd_path }}/{{ infisical_identifier }}.service"
         state: absent
 
-    - name: Ensure Infisical support files do not exist
-      ansible.builtin.file:
-        path: "{{ infisical_base_path }}/{{ item }}"
-        state: absent
-      with_items:
-        - env
-        - labels
-
-    - name: Ensure Infisical local data path does not exist if empty
-      ansible.builtin.command:
-        cmd: "rmdir {{ infisical_data_path }}"
-      register: infisical_data_path_deletion_result
-      changed_when: infisical_data_path_deletion_result.rc == 0
-      failed_when: false
-
-    - name: Ensure Infisical base path does not exist if empty
-      ansible.builtin.command:
-        cmd: "rmdir {{ infisical_base_path }}"
-      register: infisical_base_path_deletion_result
-      changed_when: infisical_base_path_deletion_result.rc == 0
-      failed_when: false
-
     - name: Ensure Infisical container network does not exist
       when: infisical_container_network_deletion_enabled
       block:
@@ -65,20 +43,7 @@
           register: infisical_network_deletion_result
           changed_when: infisical_container_network in infisical_network_deletion_result.stdout
 
-- name: Check existence of Infisical local data path
-  ansible.builtin.stat:
-    path: "{{ infisical_data_path }}"
-  register: infisical_data_path_stat
-
-# We just want to notify the user. Deleting data is too destructive.
-- name: Inject the message about the remaining Infisical local data path
-  when: infisical_data_path_stat.stat.exists | bool
-  ansible.builtin.set_fact:
-    devture_playbook_runtime_messages_list: |
-      {{
-        devture_playbook_runtime_messages_list | default([])
-        +
-        [
-          "Note: As the local Infisical instance has been removed, some old data remains in `" + infisical_data_path + "`. Feel free to delete it."
-        ]
-      }}
+    - name: Ensure Infisical path does not exist
+      ansible.builtin.file:
+        path: "{{ infisical_base_path }}"
+        state: absent
