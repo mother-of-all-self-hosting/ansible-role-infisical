@@ -5,6 +5,31 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
+- name: (Deprecation) Catch and report old Infisical backend variables
+  ansible.builtin.fail:
+    msg: |-
+      Infisical does no longer use two services for the backend and frontend, and the variables for them have been removed.
+
+      The following variables in your configuration need to be removed or replaced with appropriate ones: {{ lookup('ansible.builtin.varnames', '^infisical_backend_.+', wantlist=True) | join(', ') }}
+  when: "lookup('ansible.builtin.varnames', '^infisical_backend_.+', wantlist=True) | length > 0"
+
+- name: (Deprecation) Catch and report old Infisical frontend variables
+  ansible.builtin.fail:
+    msg: |-
+      Infisical does no longer use two services for the backend and frontend, and the variables for them have been removed.
+
+      The following variables in your configuration need to be removed or replaced with appropriate ones: {{ lookup('ansible.builtin.varnames', '^infisical_frontend_.+', wantlist=True) | join(', ') }}
+  when: "lookup('ansible.builtin.varnames', '^infisical_frontend_.+', wantlist=True) | length > 0"
+
+- name: (Deprecation) Catch and report Infisical variables for MongoDB
+  ansible.builtin.fail:
+    msg: |-
+      Infisical does no longer use MongoDB, and the variables for it have been removed.
+      Refer to https://infisical.com/docs/self-hosting/guides/mongo-to-postgres for details about how to migrate from MongoDB to Postgres.
+
+      The following variables in your configuration need to be replaced with appropriate ones: {{ lookup('ansible.builtin.varnames', '^infisical_mongodb_.+', wantlist=True) | join(', ') }}
+  when: "lookup('ansible.builtin.varnames', '^infisical_mongodb_.+', wantlist=True) | length > 0"
+
 - name: (Deprecation) Catch and report renamed settings
   ansible.builtin.fail:
     msg: >-
