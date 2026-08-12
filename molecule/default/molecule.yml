@@ -32,8 +32,8 @@ provisioner:
         infisical_debug_service_enabled: false
 
         # Variables for Infisical
-        infisical_uid: 0
-        infisical_gid: 0
+        infisical_uid: 1000
+        infisical_gid: 1000
         infisical_scheme: http
         infisical_hostname: localhost
         infisical_container_labels_traefik_enabled: false
