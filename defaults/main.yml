@@ -181,7 +181,7 @@ infisical_systemd_wanted_services_list_default: []
 infisical_systemd_wanted_services_list_auto: []
 infisical_systemd_wanted_services_list_custom: []
 
-# Controls `TimeoutSec` value on the n8n systemd service
+# Controls `TimeoutSec` value on the Infisical systemd service
 # Setting an empty value respects the default one
 infisical_systemd_docker_base_timeout_sec: ""
 
