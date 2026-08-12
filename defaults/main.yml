@@ -249,6 +249,15 @@ infisical_environment_variables_site_url: "{{ infisical_scheme }}://{{ infisical
 
 infisical_environment_variables_redis_url: "redis://{{ infisical_redis_hostname }}:{{ infisical_redis_port }}/{{ infisical_redis_database }}"
 
+# Specify mailer configuration
+infisical_environment_variables_smtp_host: ""
+infisical_environment_variables_smtp_port: ""
+infisical_environment_variables_smtp_username: ""
+infisical_environment_variables_smtp_password: ""
+infisical_environment_variables_smtp_from_address: ""
+infisical_environment_variables_smtp_ignore_tls: ""
+infisical_environment_variables_smtp_require_tls: ""
+
 # Additional environment variables.
 # See: https://infisical.com/docs/self-hosting/configuration/envars
 infisical_environment_variables_additional_variables: ""

@@ -104,6 +104,32 @@ infisical_redis_port: 6379
 
 Make sure to replace `YOUR_REDIS_SERVER_HOSTNAME_HERE` with your own value.
 
+### Configuring a mailer (optional)
+
+You can configure a mailer to enable email functions such as email address verification, password recovery, etc. See [this section](https://infisical.com/docs/self-hosting/configuration/envars#email-service) on the official documentation for details.
+
+To configure the SMTP mailer, add the following configuration to your `vars.yml` file as below (adapt to your needs):
+
+```yaml
+# Specify SMTP server hostname
+infisical_environment_variables_smtp_host: ""
+
+# Specify SMTP server port
+infisical_environment_variables_smtp_port: 587
+
+# Specify SMTP server username
+infisical_environment_variables_smtp_username: ""
+
+# Specify SMTP server password
+infisical_environment_variables_smtp_password: ""
+
+# Specify the email address that emails will be sent from
+infisical_environment_variables_smtp_from_address: ""
+```
+
+>[!WARNING]
+> Without setting an authentication method such as DKIM, SPF, and DMARC for your hostname, emails are most likely to be quarantined as spam at recipient's mail servers. The worst scenario is that your server's IP address or hostname will be included in the spam list such as the one managed by [Spamhaus](https://www.spamhaus.org/). If you have set up a mail server with the [MASH project's exim-relay Ansible role](https://github.com/mother-of-all-self-hosting/ansible-role-exim-relay), you can enable DKIM signing with it. Refer [its documentation](https://github.com/mother-of-all-self-hosting/ansible-role-exim-relay/blob/main/docs/configuring-exim-relay.md#enable-dkim-support-optional) for details.
+
 ### Extending the configuration
 
 There are some additional things you may wish to configure about the service.
