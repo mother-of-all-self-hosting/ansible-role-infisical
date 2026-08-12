@@ -67,13 +67,34 @@ After adjusting the hostname, make sure to adjust your DNS records to point the 
 
 **Note**: hosting Infisical under a subpath (by configuring the `infisical_path_prefix` variable) does not seem to be possible due to Infisical's technical limitations.
 
-### Set a random string
+### Set random strings for keys
 
-You also need to set a random secure string. To do so, add the following configuration to your `vars.yml` file. The value can be generated with `pwgen -s 64 1` or in another way.
+You also need to set random secure strings for an encryption key and a secret. To do so, add the following configuration to your `vars.yml` file:
 
 ```yaml
-infisical_environment_variables_secret_key: YOUR_SECRET_KEY_HERE
+# Specify a random 16-byte hex string
+infisical_environment_variables_encryption_key: ""
+
+# Specify a random 32-byte base64 string
+infisical_environment_variables_auth_secret: ""
 ```
+
+>[!NOTE]
+> Other type of values such as one generated with `pwgen -s 64 1` does not work.
+
+### Set variables for the database server
+
+To have the Infisical instance connect to your Postgres server, add the following configuration to your `vars.yml` file.
+
+```yaml
+infisical_database_hostname: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
+infisical_database_port: 5432
+infisical_database_username: YOUR_POSTGRES_SERVER_USERNAME_HERE
+infisical_database_password: YOUR_POSTGRES_SERVER_PASSWORD_HERE
+infisical_database_name: YOUR_POSTGRES_SERVER_DATABASE_NAME_HERE
+```
+
+Make sure to replace the placeholders with your own values.
 
 ### Configure a Redis database
 
@@ -96,7 +117,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `infisical_environment_variables_additional_variables` variable
 
-See [this page](https://help.infisical.ai/en/deploy/env) on the documentation for a complete list of Infisical's config options that you could put in `infisical_environment_variables_additional_variables`.
+See [this page](https://infisical.com/docs/self-hosting/configuration/envars) on the documentation for a complete list of Infisical's config options that you could put in `infisical_environment_variables_additional_variables`.
 
 ## Installing
 

@@ -239,8 +239,22 @@ infisical_redis_database: 0
 # Specify the timezone
 infisical_environment_variables_tz: UTC
 
+# Specify a random 16-byte hex string
+# generated with `openssl rand -hex 16` or in another way.
+infisical_environment_variables_encryption_key: ""
+
+# Specify a random 32-byte base64 string
+# generated with `openssl rand -base64 32` or in another way.
+infisical_environment_variables_auth_secret: ""
+
+infisical_environment_variables_db_connection_uri: "postgresql://{{ infisical_database_username }}:{{ infisical_database_password }}@{{ infisical_database_hostname }}:{{ infisical_database_port }}/{{ infisical_database_name }}?sslmode={{ infisical_database_sslmode }}"
+
+infisical_environment_variables_site_url: "{{ infisical_scheme }}://{{ infisical_hostname }}"
+
+infisical_environment_variables_redis_url: "redis://{{ infisical_redis_hostname }}:{{ infisical_redis_port }}/{{ infisical_redis_database }}"
+
 # Additional environment variables.
-# See: https://help.infisical.ai/en/deploy/env
+# See: https://infisical.com/docs/self-hosting/configuration/envars
 infisical_environment_variables_additional_variables: ""
 
 # infisical_restart_necessary controls whether the Infisical systemd

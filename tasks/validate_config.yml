@@ -28,7 +28,8 @@
     - infisical_database_hostname
     - infisical_database_password
     - infisical_redis_hostname
-    - infisical_environment_variables_secret_key
+    - infisical_environment_variables_encryption_key
+    - infisical_environment_variables_auth_secret
 
 - name: Run if Traefik is enabled
   when: infisical_container_labels_traefik_enabled | bool
