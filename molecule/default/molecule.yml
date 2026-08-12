@@ -37,7 +37,7 @@ provisioner:
         infisical_scheme: http
         infisical_hostname: localhost
         infisical_container_labels_traefik_enabled: false
-        infisical_container_http_host_bind_port: 3000
+        infisical_container_http_host_bind_port: 8080
         infisical_environment_variables_secret_key: secret
         infisical_systemd_docker_base_timeout_sec: "5m"
 

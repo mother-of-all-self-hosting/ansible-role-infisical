@@ -53,7 +53,7 @@ infisical_container_network_deletion_enabled: true
 infisical_container_http_host_bind_port: ""
 
 # The port number in the container
-infisical_container_http_port: 3000
+infisical_container_http_port: 8080
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.

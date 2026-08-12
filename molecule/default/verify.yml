@@ -31,7 +31,7 @@
 
     - name: Wait for Infisical HTTP endpoint to respond (up to 10m)
       ansible.builtin.uri:
-        url: "http://localhost:3000/"
+        url: "http://localhost:8080/"
         method: GET
         status_code: [200, 302, 307]
         follow_redirects: none
