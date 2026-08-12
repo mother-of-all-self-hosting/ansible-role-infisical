@@ -44,13 +44,6 @@
         - { "name": "infisical_container_labels_traefik_path_prefix", when: true }
         - { "name": "infisical_container_labels_traefik_middleware_basic_auth_users", when: "{{ infisical_container_labels_traefik_middleware_basic_auth_enabled }}" }
 
-    - name: Fail if infisical_container_labels_traefik_path_prefix is different than /
-      ansible.builtin.fail:
-        msg: >-
-          infisical_container_labels_traefik_path_prefix (`{{ infisical_container_labels_traefik_path_prefix }}`) must be `/`.
-          Infisical does not support hosting under a subpath yet.
-      when: "infisical_container_labels_traefik_path_prefix != '/'"
-
     # We ensure it doesn't end with a slash, because we handle both (slash and no-slash).
     # Knowing that `infisical_container_labels_traefik_path_prefix` does not end with a slash
     # ensures we know how to set these routes up without having to do "does it end with a slash" checks elsewhere.

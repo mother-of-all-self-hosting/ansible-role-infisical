@@ -28,9 +28,6 @@ infisical_hostname: ""
 
 # The path at which Infisical is served.
 # This value must either be `/` or not end with a slash (e.g. `/infisical`).
-#
-# Hosting Infisical under a subpath does not seem to be possible due to Infisical's
-# technical limitations.
 infisical_path_prefix: /
 
 infisical_container_image: "{{ infisical_container_image_registry_prefix }}infisical/infisical:{{ infisical_container_image_tag }}"

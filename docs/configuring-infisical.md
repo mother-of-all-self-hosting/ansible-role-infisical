@@ -65,8 +65,6 @@ infisical_hostname: "example.com"
 
 After adjusting the hostname, make sure to adjust your DNS records to point the domain to your server.
 
-**Note**: hosting Infisical under a subpath (by configuring the `infisical_path_prefix` variable) does not seem to be possible due to Infisical's technical limitations.
-
 ### Set random strings for keys
 
 You also need to set random secure strings for an encryption key and a secret. To do so, add the following configuration to your `vars.yml` file:
