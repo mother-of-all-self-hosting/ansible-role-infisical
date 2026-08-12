@@ -18,18 +18,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Setting up Infisical
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Infisical](https://github.com/infisicalio/infisical) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [Infisical](https://github.com/Infisical/infisical) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-Infisical is a platform for managing databases using a spreadsheet-like interface.
+Infisical is a platform for secrets, certificates, and privileged access management.
 
-See the project's [documentation](https://help.infisical.ai/en/about) to learn what Infisical does and why it might be useful to you.
-
->[!NOTE]
-> This role is configured to use the container image which includes only functions available under the AGPL-3.0 license.
+See the project's [documentation](https://infisical.com/docs/self-hosting/overview) to learn what Infisical does and why it might be useful to you.
 
 ## Prerequisites
 
-To run a Infisical instance it is necessary to prepare a [Postgres](https://www.postgresql.org/) database server and a [Redis](https://redis.io/) database.
+To run an Infisical instance it is necessary to prepare a [Postgres](https://www.postgresql.org/) database server and a [Redis](https://redis.io/) database.
 
 If you are looking for Ansible roles for them, you can check out [ansible-role-postgres](https://github.com/mother-of-all-self-hosting/ansible-role-postgres) and [ansible-role-redis](https://github.com/mother-of-all-self-hosting/ansible-role-redis), both of which are maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team. The role for [Valkey](https://valkey.io/) ([ansible-role-valkey](https://github.com/mother-of-all-self-hosting/ansible-role-valkey)) is available as well.
 
