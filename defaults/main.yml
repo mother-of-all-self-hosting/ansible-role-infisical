@@ -239,19 +239,6 @@ infisical_redis_database: 0
 # Specify the timezone
 infisical_environment_variables_tz: UTC
 
-# Specify a random string used for session management, etc.
-# generated with `pwgen -s 64 1` or in another way.
-infisical_environment_variables_secret_key: ""
-
-# Valid values: fatal, error, warn, info, debug, trace
-infisical_environment_variables_loglevel: info
-
-# Control if loading third-party images is allowed
-infisical_environment_variables_infisical_next_env_images_all_remote: false
-
-# Control if secure session cookie is enabled
-infisical_environment_variables_backend_session_cookie_secure: true
-
 # Additional environment variables.
 # See: https://help.infisical.ai/en/deploy/env
 infisical_environment_variables_additional_variables: ""
