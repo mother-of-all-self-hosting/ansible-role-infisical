@@ -43,19 +43,11 @@ pip3 install -r ./molecule/requirements.txt
 
 ## Scenarios
 
-Currently these testing scenarios are available:
+Currently there is one testing scenario available.
 
 ### `default`
 
 Tests a standard Infisical installation with the Postgres database.
-
-### `default-valkey`
-
-Tests a standard Infisical installation with the Postgres database and the Valkey data-store.
-
-### `mariadb`
-
-Tests a standard Infisical installation with the MariaDB database.
 
 ## Running
 
