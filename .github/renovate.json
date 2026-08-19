@@ -22,7 +22,7 @@
   },
   "regex": {
     "automerge": false,
-    "schedule": ["* * * * 1,2"]
+    "schedule": ["* * * * 1"]
   },
   "packageRules": [
     {
