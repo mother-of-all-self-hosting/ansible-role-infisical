@@ -22,13 +22,15 @@ Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
 ExecStartPre={{ devture_systemd_docker_base_host_command_sh }} -c '{{ infisical_container_cleanup_command | trim | replace("\n", " ") }}'
 
+{#
+  Infisical requires writable filesystem for managing SSL certificates (along with a master SSL certificate) internally.
+#}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
       --name={{ infisical_identifier }} \
       --log-driver=none \
       --user={{ infisical_uid }}:{{ infisical_gid }} \
       --cap-drop=ALL \
-      --read-only \
       --network={{ infisical_container_network }} \
       {% if infisical_container_http_host_bind_port %}
       -p {{ infisical_container_http_host_bind_port }}:{{ infisical_container_http_port }} \
