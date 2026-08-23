@@ -14,7 +14,7 @@ infisical_enabled: true
 infisical_identifier: infisical
 infisical_base_path: "/{{ infisical_identifier }}"
 
-# renovate: datasource=docker depName=infisical/infisical
+# renovate: datasource=docker depName=infisical/infisical versioning=semver
 infisical_version: v0.162.21
 
 infisical_uid: ""
