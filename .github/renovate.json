@@ -1,52 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:best-practices",
-    ":automergeAll",
-    ":automergeBranch",
-    ":semanticCommitsDisabled"
+    "github>mother-of-all-self-hosting/renovate-config#v1.0.0"
   ],
-  "ignorePresets": [
-    "docker:pinDigests",
-    ":maintainLockFilesWeekly"
-  ],
-  "labels": [
-    "dependencies"
-  ],
-  "ansible-galaxy": {
-    "ignoreUnstable": false,
-    "versioning": "loose"
-  },
-  "pre-commit": {
-    "enabled": true
-  },
   "regex": {
-    "automerge": false,
     "schedule": ["* * * * 1"]
-  },
-  "packageRules": [
-    {
-      "matchManagers": ["github-actions"],
-      "commitBody": "[skip ci]",
-      "schedule": ["* * 1-7 */6 *"],
-      "automergeSchedule": ["* * 1-14 */6 *"],
-      "groupName": "GitHub Actions dependencies"
-    },
-    {
-      "matchManagers": ["mise", "pip_requirements", "pre-commit", "pyenv"],
-      "schedule": ["* * 1-7 */6 *"],
-      "automergeSchedule": ["* * 1-14 */6 *"]
-    }
-  ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/defaults/main.yml$/"
-      ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[a-z-0-9]+?))?\\s+[A-Za-z0-9_]+?(?:_version|_tag)\\s*:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s"
-      ]
-    }
-  ]
+  }
 }
