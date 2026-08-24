@@ -5,12 +5,35 @@
 ---
 name: molecule
 
-on: [push, pull_request]  # yamllint disable-line rule:truthy
+on:  # yamllint disable-line rule:truthy
+  push:
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "LICENSE"
+      - "LICENSES/**"
+      - "REUSE.toml"
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "LICENSE"
+      - "LICENSES/**"
+      - "REUSE.toml"
+  workflow_dispatch:
 
 jobs:
   molecule:
     name: Run Molecule scenario '${{ matrix.scenario }}' on ${{ matrix.distro }}
     runs-on: ubuntu-latest
+
+    # Same-repository pull requests already run via the push event;
+    # run pull_request jobs only for pull requests from forks.
+    if: >-
+      github.event_name != 'pull_request'
+      || github.event.pull_request.head.repo.full_name != github.repository
 
     strategy:
       matrix:
@@ -47,7 +70,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.ansible/collections
-          key: ansible-collections-${{ hashFiles('infisical/molecule/default/requirements.yml') }}
+          key: ansible-collections-${{ hashFiles('infisical/molecule/*/requirements.yml') }}
 
       - name: Run Molecule
         working-directory: infisical
