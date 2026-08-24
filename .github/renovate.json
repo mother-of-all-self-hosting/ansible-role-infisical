@@ -1,5 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Patch releases are deliberately not automerged here, unlike in most other roles in this fleet.",
+    "Infisical applies its Knex migrations from the application process itself and forward-only: dist/main.mjs awaits runMigrations() before server.listen(), and v0.162.21 has 505 rows in infisical_migrations. Patch releases do ship migrations, so an automerged patch would rewrite the schema unattended.",
+    "What that schema holds is why this role is stricter than most: Infisical is a secrets manager, so its database is where every other system's credentials live, encrypted under infisical_environment_variables_encryption_key. A migration that goes wrong is not an outage of one service, it is the loss of the key material the rest of the deployment depends on, with no way back short of restoring a backup.",
+    "The base preset already leaves custom.regex unmerged. This note records why the //patch-automerge preset must not be added alongside it."
+  ],
   "extends": [
     "github>mother-of-all-self-hosting/renovate-config#v1.0.0"
   ],
