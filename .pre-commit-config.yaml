@@ -40,7 +40,7 @@ repos:
     rev: v2.4.3
     hooks:
       - id: codespell
-  - repo: https://github.com/fsfe/reuse-tool  # https://reuse.software/dev/#pre-commit-hook
+  - repo: https://codeberg.org/fsfe/reuse-tool  # https://reuse.software/dev/#pre-commit-hook
     rev: v6.2.0
     hooks:
       - id: reuse
