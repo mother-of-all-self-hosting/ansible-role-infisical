@@ -1,70 +1,56 @@
 # SPDX-FileCopyrightText: 2025 Nikita Chernyi
+# SPDX-FileCopyrightText: 2026 Slavi Pantaleev
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-name: Autotag dependency updates
+name: Autotag releases
 
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: write  # required to push tags
-  actions: read
 
 jobs:
   autotag:
-    name: Autotag dependency updates
+    name: Autotag
     runs-on: ubuntu-latest
 
+    # Tag numbers are derived from the tags that already exist, so two commits
+    # landing close together must not be looked at simultaneously - they would
+    # both compute the same number. Runs are queued rather than cancelled, so
+    # that every commit deserving a release still gets one.
+    concurrency:
+      group: autotag
+      cancel-in-progress: false
+
     steps:
-      - name: Checkout code
+      # The full history and all tags, since we compare against the previous release.
+      - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 20  # Ensure enough history is available
+          fetch-depth: 0
 
-      - name: Set up Git config
+      - name: Determine the next tag
+        id: tag
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Fetch all tags from origin
-        run: git fetch --tags
-
-      - name: Find latest Renovate Docker commit
-        id: find_renovate_commit
-        run: |
-          git log -n 20 --pretty=format:'%H|%an|%s' | while IFS='|' read -r commit author subject; do
-            if [[ "$author" == "renovate[bot]" && "${subject,,}" == *"docker tag to "* && "${subject,,}" == *"infisical"* ]]; then
-              VERSION=$(echo "$subject" | sed -E 's/.*[Dd]ocker tag to (.+)$/\1/')
-              echo "new_version=$VERSION" >> $GITHUB_OUTPUT
-              echo "commit_hash=$commit" >> $GITHUB_OUTPUT
-              echo "Found Renovate commit: $commit with version: $VERSION"
-              break
-            fi
-          done
-
-      - name: Check if tag already exists
-        id: check_tag
-        if: steps.find_renovate_commit.outputs.new_version != ''
-        run: |
-          TAG="${{ steps.find_renovate_commit.outputs.new_version }}-0"
-          if git tag -l "$TAG" | grep -q "$TAG"; then
-            echo "Tag $TAG already exists."
-            echo "already_tagged=true" >> $GITHUB_OUTPUT
-          else
-            echo "Tag $TAG does not exist yet."
-            echo "already_tagged=false" >> $GITHUB_OUTPUT
-            echo "tag_name=$TAG" >> $GITHUB_OUTPUT
+          tag="$(bin/compute-next-tag.sh)"
+          if [ -z "$tag" ]; then
+            echo 'No release is needed for this commit'
+            exit 0
           fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-      - name: Create and push tag
-        if: steps.check_tag.outputs.already_tagged == 'false' && steps.find_renovate_commit.outputs.commit_hash != ''
+      - name: Create and push the tag
+        if: steps.tag.outputs.tag != ''
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          TAG="${{ steps.check_tag.outputs.tag_name }}"
-          HASH="${{ steps.find_renovate_commit.outputs.commit_hash }}"
-          echo "Tagging commit $HASH with $TAG"
-          git tag "$TAG" "$HASH"
-          git push origin "$TAG"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git tag "$TAG"
+          git push origin "refs/tags/$TAG"
