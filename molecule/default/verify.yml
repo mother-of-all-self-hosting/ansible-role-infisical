@@ -397,9 +397,9 @@
       ansible.builtin.debug:
         msg:
           - "Infisical systemd: {{ infisical_service_after.status.ActiveState }}, {{ infisical_service_after.status.NRestarts }} restart(s)"
-          - "Status endpoint: {{ infisical_status.status }} {{ infisical_status.json.message }}, redis={{ infisical_status.json.redisConfigured }}"
-          - "Migrations applied: {{ infisical_migrations_count.stdout | trim }}"
-          - "Version reported by the running process: {{ infisical_defaults.infisical_version }}"
-          - "Bootstrap: {{ infisical_bootstrap.json.organization.name }} / {{ infisical_bootstrap.json.user.email }}"
-          - "Secret round trip: {{ infisical_verify_secret_key }} read back intact"
-          - "Plaintext occurrences in the database: {{ infisical_dump_scan.stdout | trim }}"
+          - "Infisical status endpoint: {{ infisical_status.status }} {{ infisical_status.json.message }}, redis={{ infisical_status.json.redisConfigured }}"
+          - "Infisical migrations applied: {{ infisical_migrations_count.stdout | trim }}"
+          - "Infisical version reported by the running process: {{ infisical_defaults.infisical_version }}"
+          - "Infisical bootstrap: {{ infisical_bootstrap.json.organization.name }} / {{ infisical_bootstrap.json.user.email }}"
+          - "Infisical secret round trip: {{ infisical_verify_secret_key }} read back intact"
+          - "Infisical plaintext occurrences in the database: {{ infisical_dump_scan.stdout | trim }}"
