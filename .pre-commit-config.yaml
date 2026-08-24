@@ -12,6 +12,12 @@ repos:
         entry: Do not commit files with the .orig extension
         language: fail
         files: '[.]orig$'
+      - id: test-compute-next-tag
+        name: test the next-tag computation
+        entry: bash bin/test-compute-next-tag.sh
+        language: system
+        pass_filenames: false
+        files: '^(bin/compute-next-tag[.]sh|bin/test-compute-next-tag[.]sh|defaults/main[.]yml)$'
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
