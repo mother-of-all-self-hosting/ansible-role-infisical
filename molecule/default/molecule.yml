@@ -46,6 +46,22 @@ provisioner:
         infisical_environment_variables_otel_telemetry_collection_enabled: true
         infisical_environment_variables_otel_export_type: prometheus
 
+        # `POST /api/v1/admin/bootstrap` is the documented way to provision the
+        # first administrator without a browser, and it is what verify.yml uses
+        # to get far enough to store a secret and read it back. The token it
+        # hands out carries no `exp` claim, and Infisical rejects `exp`-less
+        # tokens once `LEGACY_IDENTITY_ACCESS_TOKEN_EXPIRATION_ENFORCED_AT`
+        # (default 2026-05-04) plus `MAX_MACHINE_IDENTITY_TOKEN_AGE` (default
+        # 90 days) has passed - which it has, since 2026-08-02. The endpoint
+        # therefore mints tokens that are already expired when handed over, in
+        # v0.162.21 and in v0.162.24 alike.
+        #
+        # Moving the cutoff out of reach restores the endpoint. The date is far
+        # future rather than merely recent, so that this scenario does not
+        # start failing again ninety days after it was last touched.
+        infisical_environment_variables_additional_variables: |
+          LEGACY_IDENTITY_ACCESS_TOKEN_EXPIRATION_ENFORCED_AT=2099-01-01T00:00:00.000Z
+
         # Variables required for Infisical to connect to the Postgres database
         infisical_database_hostname: "{{ postgres_connection_hostname }}"
         infisical_database_port: "{{ postgres_connection_port }}"

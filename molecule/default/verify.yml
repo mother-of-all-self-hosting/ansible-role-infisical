@@ -1,14 +1,53 @@
 # SPDX-FileCopyrightText: 2026 Suguru Hirahara
 # SPDX-FileCopyrightText: 2026 spatterlight
+# SPDX-FileCopyrightText: 2026 Slavi Pantaleev
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Verify Infisical systemd service
+- name: Verify Infisical
   hosts: all
   become: true
   gather_facts: false
+
+  vars:
+    infisical_verify_base_url: "http://localhost:{{ infisical_container_http_host_bind_port }}"
+    infisical_verify_metrics_url: "http://localhost:{{ infisical_container_metrics_host_bind_port }}/metrics"
+
+    infisical_verify_admin_email: molecule-admin@example.com
+    infisical_verify_admin_password: molecule-Sup3rS3cret-passw0rd
+    infisical_verify_org_name: molecule-org
+    infisical_verify_project_name: molecule-project
+
+    # The secret this scenario round-trips. Its value is deliberately a
+    # distinctive literal, because the point of the last few tasks is to go
+    # looking for it in the database and not find it.
+    infisical_verify_secret_key: MOLECULE_CANARY
+    infisical_verify_secret_value: molecule-plaintext-canary-9c1f2b
+
+    # A single SQL statement run inside the Postgres container this scenario
+    # started, printing bare values with no headers.
+    #
+    # The docker CLI is invoked directly here and below: the ansible-lint
+    # environment used by pre-commit has no collections installed, so
+    # community.docker.* would fail the playbook syntax check.
+    infisical_verify_psql_command: >-
+      docker exec --env=PGPASSWORD={{ infisical_database_password | quote }}
+      {{ postgres_identifier | default('postgres') }}
+      psql -U {{ infisical_database_username | quote }}
+      -d {{ infisical_database_name | quote }} -tAc
+
   tasks:
+    # Role defaults are not in scope in a verify play, but the version that
+    # Renovate bumps lives in them and is what the running Infisical is checked
+    # against below. Only leaf literals may be read out of this namespace -
+    # anything Jinja-derived (`infisical_container_image_tag` and friends)
+    # would be resolved against an empty one.
+    - name: Load the Infisical role defaults
+      ansible.builtin.include_vars:
+        file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
+        name: infisical_defaults
+
     - name: Wait for Infisical service to become active (up to 180s)
       ansible.builtin.systemd:
         name: infisical.service
@@ -29,43 +68,338 @@
         cmd: journalctl -xeu infisical.service
       changed_when: false
 
-    - name: Wait for Infisical HTTP endpoint to respond (up to 10m)
+    # `active` on its own says nothing here, and this role's unit is a case
+    # where it actively misleads. Infisical exits(1) when it cannot reach
+    # Postgres - an image started against an unresolvable database host dies
+    # with "Boot up migration failed" - and the unit carries `Restart=always`
+    # with `RestartSec=30`. Completely broken database wiring therefore still
+    # shows `active` for a moment out of every thirty seconds, which is long
+    # enough for the poll above to catch it. systemd's own restart counter is
+    # what tells the two apart, and it comes back in the same `status` mapping
+    # the poll above already registered.
+    - name: Assert Infisical has not been restarted by systemd
+      ansible.builtin.assert:
+        that: infisical_service.status.NRestarts | int == 0
+        fail_msg: >-
+          infisical.service has been restarted {{ infisical_service.status.NRestarts }} time(s), so it is
+          crash-looping rather than running - `active` here only means systemd caught it between restarts
+        success_msg: "infisical.service has never been restarted, so it is running rather than crash-looping"
+
+    # Infisical awaits `runMigrations()` before `server.listen()` in
+    # dist/main.mjs, so the port does not open at all until every migration has
+    # been applied - which makes any HTTP answer proof that migrations
+    # completed. `/api/status` is nonetheless the endpoint to wait on rather
+    # than `/`: the frontend is served by the same process, so `/` returns a
+    # fully rendered 200 that says nothing beyond "node is up", while
+    # `/api/status` calls `getServerCfg()` and reads the `superAdmin` row out
+    # of Postgres on every request.
+    - name: Wait for the Infisical status endpoint to answer (up to 10m)
       ansible.builtin.uri:
-        url: "http://localhost:8080/"
+        url: "{{ infisical_verify_base_url }}/api/status"
         method: GET
-        status_code: [200, 302, 307]
-        follow_redirects: none
-      register: infisical_endpoint
-      until: infisical_endpoint.status in [200, 302, 307]
+        status_code: [200, 400, 401, 403, 404, 500, 502, 503]
+        return_content: true
+      register: infisical_status
+      until: infisical_status.status == 200
       retries: 120
       delay: 5
 
-    - name: Assert Infisical HTTP endpoint responds
+    # `redisConfigured` is the running application's own reading of `REDIS_URL`,
+    # which reaches it only through the environment file this role renders, so
+    # this is where `infisical_redis_hostname` is confirmed to have arrived.
+    - name: Assert Infisical reports a healthy instance wired to Redis
       ansible.builtin.assert:
-        that: infisical_endpoint.status in [200, 302, 307]
-        fail_msg: "Infisical did not respond as expected ({{ infisical_endpoint.status | default('no response') }})"
-        success_msg: "Infisical responded with {{ infisical_endpoint.status }}"
+        that:
+          - infisical_status.status == 200
+          - infisical_status.json.message == 'Ok'
+          - infisical_status.json.redisConfigured
+        fail_msg: "Unexpected /api/status payload: {{ infisical_status.json | default('no payload') }}"
+        success_msg: "Infisical reports 'Ok' and a configured Redis"
 
-    - name: Wait for Infisical metrics HTTP endpoint to respond (up to 10m)
+    # Read from the other end: the migrations Infisical claims to have applied
+    # are counted in the Postgres container this scenario started, rather than
+    # taken on the application's word. Knex records one row per applied
+    # migration, and v0.162.21 has several hundred.
+    - name: Count the migrations Infisical applied in the Postgres container
+      ansible.builtin.command:
+        cmd: "{{ infisical_verify_psql_command }} {{ 'SELECT count(*) FROM infisical_migrations' | quote }}"
+      register: infisical_migrations_count
+      changed_when: false
+
+    - name: Assert Infisical migrated its schema into that database
+      ansible.builtin.assert:
+        that: infisical_migrations_count.stdout | trim | int > 0
+        fail_msg: >-
+          The database '{{ infisical_database_name }}' records no applied migrations -
+          Infisical is not using it
+        success_msg: >-
+          The database '{{ infisical_database_name }}' records
+          {{ infisical_migrations_count.stdout | trim }} applied migrations
+
+    # The metrics server only starts when `OTEL_TELEMETRY_COLLECTION_ENABLED`
+    # and `OTEL_EXPORT_TYPE` reach the process, so its existence is already a
+    # statement about this role's environment file. It also publishes the
+    # version the running process believes it is, which is what ties this
+    # scenario to the version Renovate bumps: a bump to an image that cannot
+    # boot or migrate never gets this far.
+    - name: Retrieve the Infisical Prometheus metrics
       ansible.builtin.uri:
-        url: "http://localhost:9464/metrics"
+        url: "{{ infisical_verify_metrics_url }}"
         method: GET
-        status_code: [200, 302, 307]
-        follow_redirects: none
-      register: infisical_endpoint_metrics
-      until: infisical_endpoint_metrics.status in [200, 302, 307]
-      retries: 120
+        status_code: [200, 400, 401, 403, 404, 500, 502, 503]
+        return_content: true
+      register: infisical_metrics
+      until: infisical_metrics.status == 200
+      retries: 60
       delay: 5
 
-    - name: Assert Infisical metrics HTTP endpoint responds
+    - name: Assert the metrics endpoint reports the version this role installs
       ansible.builtin.assert:
-        that: infisical_endpoint_metrics.status in [200, 302, 307]
-        fail_msg: "Infisical metrics endpoint did not respond as expected ({{ infisical_endpoint_metrics.status | default('no response') }})"
-        success_msg: "Infisical metrics endpoint responded with {{ infisical_endpoint_metrics.status }}"
+        that:
+          - infisical_metrics.status == 200
+          - "'service_name=\"infisical-core\"' in infisical_metrics.content"
+          - "'service_version=\"' ~ infisical_defaults.infisical_version ~ '\"' in infisical_metrics.content"
+        fail_msg: >-
+          The metrics endpoint does not report {{ infisical_defaults.infisical_version }}:
+          {{ infisical_metrics.content | default('') | regex_findall('service_version="[^"]*"') | join(', ') | default('no version at all', true) }}
+        success_msg: "The running Infisical reports {{ infisical_defaults.infisical_version }}"
 
-    - name: Show Infisical systemd service status summary
+    # Confirmed once more from the container runtime, so that a stale container
+    # left behind by an earlier version cannot pass the check above by serving
+    # metrics the new image never produced.
+    - name: Inspect the Infisical container
+      ansible.builtin.command:
+        cmd: "docker inspect {{ infisical_defaults.infisical_identifier }}"
+      register: infisical_inspect
+      changed_when: false
+
+    - name: Assert the running container was created from the pinned image
+      vars:
+        infisical_verify_container: "{{ (infisical_inspect.stdout | from_json)[0] }}"
+      ansible.builtin.assert:
+        that: infisical_defaults.infisical_version in infisical_verify_container.Config.Image
+        fail_msg: >-
+          The running container was created from {{ infisical_verify_container.Config.Image }},
+          not from an image tagged {{ infisical_defaults.infisical_version }}
+        success_msg: "The running container was created from {{ infisical_verify_container.Config.Image }}"
+
+    # Everything from here on exercises what Infisical is for. The instance has
+    # no administrator yet, which `/api/status` reports as `inviteOnlySignup`
+    # being true.
+    - name: Assert Infisical has not been bootstrapped yet
+      ansible.builtin.assert:
+        that: infisical_status.json.inviteOnlySignup
+        fail_msg: "Infisical reports an already-bootstrapped instance before this scenario bootstrapped one"
+        success_msg: "Infisical reports an instance waiting to be bootstrapped"
+
+    - name: Bootstrap the Infisical instance administrator
+      ansible.builtin.uri:
+        url: "{{ infisical_verify_base_url }}/api/v1/admin/bootstrap"
+        method: POST
+        body_format: json
+        body:
+          email: "{{ infisical_verify_admin_email }}"
+          password: "{{ infisical_verify_admin_password }}"
+          organization: "{{ infisical_verify_org_name }}"
+        status_code: [200, 400, 401, 403, 404, 422, 500]
+        return_content: true
+      register: infisical_bootstrap
+      changed_when: infisical_bootstrap.status == 200
+
+    - name: Assert the instance was bootstrapped with a super-admin and an organization
+      ansible.builtin.assert:
+        that:
+          - infisical_bootstrap.status == 200
+          - infisical_bootstrap.json.user.email == infisical_verify_admin_email
+          - infisical_bootstrap.json.user.superAdmin
+          - infisical_bootstrap.json.organization.name == infisical_verify_org_name
+          - infisical_bootstrap.json.identity.credentials.token | length > 0
+        fail_msg: "Unexpected bootstrap payload: {{ infisical_bootstrap.json | default('no payload') }}"
+        success_msg: >-
+          Infisical bootstrapped '{{ infisical_verify_admin_email }}' as super-admin of
+          '{{ infisical_verify_org_name }}'
+
+    - name: Remember the Infisical instance admin token
+      ansible.builtin.set_fact:
+        infisical_verify_token: "{{ infisical_bootstrap.json.identity.credentials.token }}"
+
+    # `/api/status` is asked again, and must now disagree with itself. The
+    # field it derives from the `superAdmin` row has flipped because of a write
+    # that just happened, which is what proves the endpoint reads Postgres per
+    # request rather than answering from something cached at boot.
+    - name: Retrieve the Infisical status endpoint after bootstrapping
+      ansible.builtin.uri:
+        url: "{{ infisical_verify_base_url }}/api/status"
+        method: GET
+        status_code: [200, 400, 401, 403, 404, 500, 502, 503]
+        return_content: true
+      register: infisical_status_after_bootstrap
+
+    - name: Assert the status endpoint reflects the bootstrap it just recorded
+      ansible.builtin.assert:
+        that:
+          - infisical_status_after_bootstrap.status == 200
+          - not infisical_status_after_bootstrap.json.inviteOnlySignup
+        fail_msg: >-
+          /api/status still reports an unbootstrapped instance after one was bootstrapped,
+          so it is not reading the database per request
+        success_msg: "/api/status reflects the bootstrap, so it reads the database per request"
+
+    - name: Create an Infisical project
+      ansible.builtin.uri:
+        url: "{{ infisical_verify_base_url }}/api/v2/workspace"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ infisical_verify_token }}"
+        body_format: json
+        body:
+          projectName: "{{ infisical_verify_project_name }}"
+          type: secret-manager
+        status_code: [200, 201, 400, 401, 403, 404, 422, 500]
+        return_content: true
+      register: infisical_project
+      changed_when: infisical_project.status in [200, 201]
+
+    - name: Assert the project was created
+      ansible.builtin.assert:
+        that:
+          - infisical_project.status in [200, 201]
+          - infisical_project.json.project.name == infisical_verify_project_name
+          - infisical_project.json.project.id | length > 0
+        fail_msg: "Unexpected project payload: {{ infisical_project.json | default('no payload') }}"
+        success_msg: "The project '{{ infisical_verify_project_name }}' was created"
+
+    - name: Store a secret in that project
+      ansible.builtin.uri:
+        url: "{{ infisical_verify_base_url }}/api/v3/secrets/raw/{{ infisical_verify_secret_key }}"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ infisical_verify_token }}"
+        body_format: json
+        body:
+          workspaceId: "{{ infisical_project.json.project.id }}"
+          environment: dev
+          secretPath: /
+          type: shared
+          secretValue: "{{ infisical_verify_secret_value }}"
+        status_code: [200, 201, 400, 401, 403, 404, 422, 500]
+        return_content: true
+      register: infisical_secret_written
+      changed_when: infisical_secret_written.status in [200, 201]
+
+    - name: Assert the secret was stored
+      ansible.builtin.assert:
+        that:
+          - infisical_secret_written.status in [200, 201]
+          - infisical_secret_written.json.secret.secretKey == infisical_verify_secret_key
+        fail_msg: "Unexpected write payload: {{ infisical_secret_written.json | default('no payload') }}"
+        success_msg: "The secret '{{ infisical_verify_secret_key }}' was stored"
+
+    - name: Read that secret back
+      vars:
+        infisical_verify_read_query: "workspaceId={{ infisical_project.json.project.id }}&environment=dev&secretPath=%2F"
+      ansible.builtin.uri:
+        url: "{{ infisical_verify_base_url }}/api/v3/secrets/raw/{{ infisical_verify_secret_key }}?{{ infisical_verify_read_query }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ infisical_verify_token }}"
+        status_code: [200, 400, 401, 403, 404, 422, 500]
+        return_content: true
+      register: infisical_secret_read
+
+    # The round trip closes here: a value handed to Infisical over HTTP comes
+    # back out of it byte for byte, having passed through the encryption key
+    # this role configured and the Postgres this role wired up.
+    - name: Assert the secret reads back exactly as it was written
+      ansible.builtin.assert:
+        that:
+          - infisical_secret_read.status == 200
+          - infisical_secret_read.json.secret.secretValue == infisical_verify_secret_value
+        fail_msg: >-
+          The secret read back as
+          {{ infisical_secret_read.json.secret.secretValue | default('nothing at all', true) }}
+        success_msg: "The secret read back exactly as it was written"
+
+    # And the check that only a secrets manager owes anyone: the value that
+    # just round-tripped must not be sitting in the database in the clear.
+    # `secrets_v2.encryptedValue` is a bytea, so it is decoded to text before
+    # being searched - the row must exist, must carry ciphertext, and must not
+    # contain the plaintext.
+    - name: Look for the plaintext secret in its own database row
+      vars:
+        infisical_verify_row_query: >-
+          SELECT count(*) FROM secrets_v2
+          WHERE key = '{{ infisical_verify_secret_key }}'
+          AND octet_length("encryptedValue") > 0
+          AND position('{{ infisical_verify_secret_value }}' in encode("encryptedValue", 'escape')) = 0
+      ansible.builtin.command:
+        cmd: "{{ infisical_verify_psql_command }} {{ infisical_verify_row_query | quote }}"
+      register: infisical_secret_row
+      changed_when: false
+
+    - name: Assert the secret is stored encrypted rather than in the clear
+      ansible.builtin.assert:
+        that: infisical_secret_row.stdout | trim | int == 1
+        fail_msg: >-
+          No secrets_v2 row for '{{ infisical_verify_secret_key }}' holds ciphertext that lacks the
+          plaintext value - Infisical is either not storing it here, or storing it unencrypted
+        success_msg: "The secrets_v2 row for '{{ infisical_verify_secret_key }}' holds ciphertext, not the plaintext"
+
+    # That row is not the only place a value could leak to, so the whole
+    # database is searched as well. Anything that wrote the plaintext into an
+    # audit log, a version history row or a cache table would show up here.
+    - name: Search the entire database dump for the plaintext secret
+      ansible.builtin.command:
+        argv:
+          - docker
+          - exec
+          - "--env=PGPASSWORD={{ infisical_database_password }}"
+          - "{{ postgres_identifier | default('postgres') }}"
+          - sh
+          - -c
+          - >-
+            pg_dump -U {{ infisical_database_username | quote }} -d {{ infisical_database_name | quote }}
+            | grep -c {{ infisical_verify_secret_value | quote }} || true
+      register: infisical_dump_scan
+      changed_when: false
+
+    - name: Assert the plaintext secret appears nowhere in the database
+      ansible.builtin.assert:
+        that: infisical_dump_scan.stdout | trim | int == 0
+        fail_msg: >-
+          The plaintext value of '{{ infisical_verify_secret_key }}' appears
+          {{ infisical_dump_scan.stdout | trim }} time(s) in a dump of '{{ infisical_database_name }}'
+        success_msg: >-
+          The plaintext value of '{{ infisical_verify_secret_key }}' appears nowhere in a dump of
+          '{{ infisical_database_name }}'
+
+    # Asked once more at the end, so that the whole exchange above is known to
+    # have been served by one process that stayed up throughout, rather than by
+    # a succession of them that systemd kept replacing.
+    - name: Read the Infisical service state again after the round trip
+      ansible.builtin.systemd:
+        name: infisical.service
+      register: infisical_service_after
+
+    - name: Assert Infisical stayed up for the whole round trip
+      ansible.builtin.assert:
+        that:
+          - infisical_service_after.status.ActiveState == 'active'
+          - infisical_service_after.status.NRestarts | int == 0
+          - infisical_service_after.status.ExecMainStartTimestamp == infisical_service.status.ExecMainStartTimestamp
+        fail_msg: >-
+          infisical.service is {{ infisical_service_after.status.ActiveState }} with
+          {{ infisical_service_after.status.NRestarts }} restart(s) after the round trip - the process
+          that answered the last request is not the one that answered the first
+        success_msg: "infisical.service served the whole round trip from a single process"
+
+    - name: Show Infisical verification summary
       ansible.builtin.debug:
         msg:
-          - "Infisical systemd: {{ infisical_service.status.ActiveState }}"
-          - "Infisical HTTP: {{ infisical_endpoint.status }}"
-          - "Infisical metrics HTTP: {{ infisical_endpoint_metrics.status }}"
+          - "Infisical systemd: {{ infisical_service_after.status.ActiveState }}, {{ infisical_service_after.status.NRestarts }} restart(s)"
+          - "Status endpoint: {{ infisical_status.status }} {{ infisical_status.json.message }}, redis={{ infisical_status.json.redisConfigured }}"
+          - "Migrations applied: {{ infisical_migrations_count.stdout | trim }}"
+          - "Version reported by the running process: {{ infisical_defaults.infisical_version }}"
+          - "Bootstrap: {{ infisical_bootstrap.json.organization.name }} / {{ infisical_bootstrap.json.user.email }}"
+          - "Secret round trip: {{ infisical_verify_secret_key }} read back intact"
+          - "Plaintext occurrences in the database: {{ infisical_dump_scan.stdout | trim }}"
