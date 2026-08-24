@@ -3,7 +3,7 @@ galaxy_info:
   author: Suguru Hirahara
   company: progressiv
   role_name: infisical
-  namespace: progressiv
+  namespace: mash
   description: Infisical
   platforms:
     - name: Debian
