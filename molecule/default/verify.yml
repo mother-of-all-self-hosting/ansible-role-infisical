@@ -169,7 +169,7 @@
     # metrics the new image never produced.
     - name: Inspect the Infisical container
       ansible.builtin.command:
-        cmd: "docker inspect {{ infisical_defaults.infisical_identifier }}"
+        cmd: "docker container inspect {{ infisical_defaults.infisical_identifier }}"
       register: infisical_inspect
       changed_when: false
 
