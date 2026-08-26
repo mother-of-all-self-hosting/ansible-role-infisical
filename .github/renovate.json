@@ -7,7 +7,7 @@
     "The base preset already leaves custom.regex unmerged. This note records why the //patch-automerge preset must not be added alongside it."
   ],
   "extends": [
-    "github>mother-of-all-self-hosting/renovate-config#v1.0.0"
+    "github>mother-of-all-self-hosting/renovate-config#v1.1.0"
   ],
   "regex": {
     "schedule": ["* * * * 1"]
