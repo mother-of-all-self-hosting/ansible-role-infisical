@@ -391,7 +391,7 @@
           that answered the last request is not the one that answered the first
         success_msg: "infisical.service served the whole round trip from a single process"
 
-    - name: Show Infisical verification summary
+    - name: Show the Infisical verification summary
       ansible.builtin.debug:
         msg:
           - "Infisical systemd: {{ infisical_service_after.status.ActiveState }}, {{ infisical_service_after.status.NRestarts }} restart(s)"
