@@ -46,21 +46,27 @@
         file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
         name: infisical_defaults
 
-    - name: Wait for Infisical service to become active (up to 180s)
-      ansible.builtin.systemd:
+    - name: Wait for the Infisical systemd service to become active (up to 180s)
+      ansible.builtin.systemd_service:
         name: infisical.service
       register: infisical_service
       until: infisical_service.status.ActiveState == 'active'
       retries: 36
       delay: 5
+      # So that giving up is reported by the assertion below rather than as a
+      # wall of systemd unit properties.
+      failed_when: false
 
-    - name: Assert Infisical service is active
+    # `Restart=always` in the systemd unit means that even a container which crashes
+    # and gets restarted reads as active here, so this is a precondition rather than
+    # a result.
+    - name: Assert the Infisical systemd service is active
       ansible.builtin.assert:
         that: infisical_service.status.ActiveState == 'active'
-        fail_msg: "infisical.service not active ({{ infisical_service.status.ActiveState }})"
+        fail_msg: "infisical.service is not active ({{ infisical_service.status.ActiveState }})"
         success_msg: "infisical.service is active"
 
-    - name: Retrieve Infisical service log for debugging
+    - name: Retrieve the Infisical systemd service log for debugging
       when: infisical_debug_service_enabled | bool
       ansible.builtin.command:
         cmd: journalctl -xeu infisical.service
@@ -375,7 +381,7 @@
     # have been served by one process that stayed up throughout, rather than by
     # a succession of them that systemd kept replacing.
     - name: Read the Infisical service state again after the round trip
-      ansible.builtin.systemd:
+      ansible.builtin.systemd_service:
         name: infisical.service
       register: infisical_service_after
 
