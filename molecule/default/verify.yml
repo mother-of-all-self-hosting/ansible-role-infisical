@@ -173,13 +173,13 @@
 
     - name: Assert the running container was created from the pinned image
       vars:
-        infisical_verify_container: "{{ (infisical_inspect.stdout | from_json)[0] }}"
+        infisical_container: "{{ (infisical_inspect.stdout | from_json)[0] }}"
       ansible.builtin.assert:
-        that: infisical_defaults.infisical_version in infisical_verify_container.Config.Image
+        that: infisical_defaults.infisical_version in infisical_container.Config.Image
         fail_msg: >-
-          The running container was created from {{ infisical_verify_container.Config.Image }},
+          The running container was created from {{ infisical_container.Config.Image }},
           not from an image tagged {{ infisical_defaults.infisical_version }}
-        success_msg: "The running container was created from {{ infisical_verify_container.Config.Image }}"
+        success_msg: "The running container was created from {{ infisical_container.Config.Image }}"
 
     # Everything from here on exercises what Infisical is for. The instance has
     # no administrator yet, which `/api/status` reports as `inviteOnlySignup`
