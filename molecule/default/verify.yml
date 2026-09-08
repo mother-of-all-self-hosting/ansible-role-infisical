@@ -69,7 +69,7 @@
     - name: Retrieve the Infisical systemd service log for debugging
       when: infisical_debug_service_enabled | bool
       ansible.builtin.command:
-        cmd: journalctl -xeu infisical.service
+        cmd: journalctl --no-pager --output=cat --unit=infisical.service
       changed_when: false
 
     # `active` on its own says nothing here, and this role's unit is a case
