@@ -38,6 +38,8 @@
       -d {{ infisical_database_name | quote }} -tAc
 
   tasks:
+    - name: Verify that Infisical works
+      block:
     # The role is not included in this playbook, so its defaults are not in
     # scope. Reading defaults/main.yml directly ties the version assertion
     # below.
@@ -407,3 +409,19 @@
           - "Infisical bootstrap: {{ infisical_bootstrap.json.organization.name }} / {{ infisical_bootstrap.json.user.email }}"
           - "Infisical secret round trip: {{ infisical_verify_secret_key }} read back intact"
           - "Infisical plaintext occurrences in the database: {{ infisical_dump_scan.stdout | trim }}"
+
+      rescue:
+        # Whatever went wrong, the reason is almost always in the systemd service log.
+        - name: Retrieve the Infisical systemd service log
+          ansible.builtin.command:
+            cmd: journalctl --no-pager --output=cat --unit=infisical.service
+          register: infisical_service_log
+          changed_when: false
+
+        - name: Show the Infisical systemd service log
+          ansible.builtin.debug:
+            var: infisical_service_log.stdout_lines
+
+        - name: Fail because verification did not pass
+          ansible.builtin.fail:
+            msg: "Infisical verification failed. The systemd service log is printed above."
