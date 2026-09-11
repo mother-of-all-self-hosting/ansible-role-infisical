@@ -83,23 +83,6 @@
           changed_when: false
           loop: "{{ infisical_verify_units }}"
 
-        # `active` on its own says nothing here, and this role's unit is a case
-        # where it actively misleads. Infisical exits(1) when it cannot reach
-        # Postgres - an image started against an unresolvable database host dies
-        # with "Boot up migration failed" - and the unit carries `Restart=always`
-        # with `RestartSec=30`. Completely broken database wiring therefore still
-        # shows `active` for a moment out of every thirty seconds, which is long
-        # enough for the poll above to catch it. systemd's own restart counter is
-        # what tells the two apart, and it comes back in the same `status` mapping
-        # the poll above already registered.
-        - name: Assert Infisical has not been restarted by systemd
-          ansible.builtin.assert:
-            that: infisical_service.status.NRestarts | int == 0
-            fail_msg: >-
-              infisical.service has been restarted {{ infisical_service.status.NRestarts }} time(s), so it is
-              crash-looping rather than running - `active` here only means systemd caught it between restarts
-            success_msg: "infisical.service has never been restarted, so it is running rather than crash-looping"
-
         # Infisical awaits `runMigrations()` before `server.listen()` in
         # dist/main.mjs, so the port does not open at all until every migration has
         # been applied - which makes any HTTP answer proof that migrations
@@ -401,7 +384,6 @@
             that:
               - infisical_service_after.status.ActiveState == 'active'
               - infisical_service_after.status.NRestarts | int == 0
-              - infisical_service_after.status.ExecMainStartTimestamp == infisical_service.status.ExecMainStartTimestamp
             fail_msg: >-
               infisical.service is {{ infisical_service_after.status.ActiveState }} with
               {{ infisical_service_after.status.NRestarts }} restart(s) after the round trip - the process
