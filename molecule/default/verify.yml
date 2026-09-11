@@ -37,6 +37,11 @@
       psql -U {{ infisical_database_username | quote }}
       -d {{ infisical_database_name | quote }} -tAc
 
+    infisical_verify_units:
+      - infisical.service
+      - postgres.service
+      - valkey.service
+
   tasks:
     - name: Verify that Infisical works
       block:
@@ -48,13 +53,14 @@
             file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
             name: infisical_defaults
 
-        - name: Wait for the Infisical systemd service to become active (up to 180s)
+        - name: Wait for the Infisical systemd services to become active (up to 180s each)
           ansible.builtin.systemd_service:
-            name: infisical.service
-          register: infisical_service
-          until: infisical_service.status.ActiveState == 'active'
+            name: "{{ item }}"
+          register: infisical_services
+          until: infisical_services.status.ActiveState == 'active'
           retries: 36
           delay: 5
+          loop: "{{ infisical_verify_units }}"
           # So that giving up is reported by the assertion below rather than as a
           # wall of systemd unit properties.
           failed_when: false
@@ -62,17 +68,20 @@
         # `Restart=always` in the systemd unit means that even a container which crashes
         # and gets restarted reads as active here, so this is a precondition rather than
         # a result.
-        - name: Assert the Infisical systemd service is active
+        - name: Assert the Infisical systemd services are active
           ansible.builtin.assert:
-            that: infisical_service.status.ActiveState == 'active'
-            fail_msg: "infisical.service is not active ({{ infisical_service.status.ActiveState }})"
-            success_msg: "infisical.service is active"
+            that: infisical_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
+            fail_msg: >-
+              Not every service is active:
+              {{ dict(infisical_verify_units | zip(infisical_services.results | map(attribute='status.ActiveState'))) }}
+            success_msg: "Every systemd service is active"
 
-        - name: Retrieve the Infisical systemd service log for debugging
+        - name: Retrieve the Infisical systemd services log for debugging
           when: infisical_debug_service_enabled | bool
           ansible.builtin.command:
-            cmd: journalctl --no-pager --output=cat --unit=infisical.service
+            cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
           changed_when: false
+          loop: "{{ infisical_verify_units }}"
 
         # `active` on its own says nothing here, and this role's unit is a case
         # where it actively misleads. Infisical exits(1) when it cannot reach
@@ -402,7 +411,7 @@
         - name: Show the Infisical verification summary
           ansible.builtin.debug:
             msg:
-              - "Infisical systemd: {{ infisical_service_after.status.ActiveState }}, {{ infisical_service_after.status.NRestarts }} restart(s)"
+              - "Infisical systemd: {% for unit, state in infisical_verify_units | zip(infisical_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
               - "Infisical status endpoint: {{ infisical_status.status }} {{ infisical_status.json.message }}, redis={{ infisical_status.json.redisConfigured }}"
               - "Infisical migrations applied: {{ infisical_migrations_count.stdout | trim }}"
               - "Infisical version reported by the running process: {{ infisical_defaults.infisical_version }}"
