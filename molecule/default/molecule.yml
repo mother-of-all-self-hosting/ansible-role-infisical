@@ -31,6 +31,7 @@ provisioner:
       all:
         # Helper variables
         infisical_debug_service_enabled: false
+        infisical_restarts_check_enabled: true
 
         # Variables for Infisical
         infisical_uid: 1000
