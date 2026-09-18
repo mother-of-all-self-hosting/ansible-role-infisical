@@ -138,7 +138,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `infisical_environment_variables_additional_variables` variable
 
-See [this page](https://infisical.com/docs/self-hosting/configuration/envars) on the documentation for a complete list of Infisical's config options that you could put in `infisical_environment_variables_additional_variables`.
+See [this page](https://infisical.com/docs/self-hosting/configuration/envars) on the documentation for a complete list of Infisical's config options that you can put in `infisical_environment_variables_additional_variables`.
 
 ## Installing
 
