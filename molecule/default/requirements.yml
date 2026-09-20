@@ -8,7 +8,7 @@ roles:
     version: v18.6-2
     name: ansible-role-postgres
   - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-valkey.git
-    version: v9.1.2-1
+    version: v9.1.2-2
     name: ansible-role-valkey
   - src: git+https://github.com/devture/com.devture.ansible.role.playbook_help.git
     version: main
