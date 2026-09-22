@@ -106,7 +106,7 @@ Make sure to replace `YOUR_REDIS_SERVER_HOSTNAME_HERE` with your own value.
 
 ### Configuring a mailer (optional)
 
-You can configure a mailer to enable email functions such as email address verification, password recovery, etc. See [this section](https://infisical.com/docs/self-hosting/configuration/envars#email-service) on the official documentation for details.
+You can configure a mailer to enable email functions such as email address verification, password recovery, etc. Refer to [this section](https://infisical.com/docs/self-hosting/configuration/envars#email-service) on the official documentation for details.
 
 To configure the SMTP mailer, add the following configuration to your `vars.yml` file as below (adapt to your needs):
 
@@ -138,7 +138,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `infisical_environment_variables_additional_variables` variable
 
-See [this page](https://infisical.com/docs/self-hosting/configuration/envars) on the documentation for a complete list of Infisical's config options that you can put in `infisical_environment_variables_additional_variables`.
+Refer to [this page](https://infisical.com/docs/self-hosting/configuration/envars) on the documentation for a complete list of Infisical's config options that you can put in `infisical_environment_variables_additional_variables`.
 
 ## Installing
 
