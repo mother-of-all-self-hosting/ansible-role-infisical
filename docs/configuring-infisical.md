@@ -114,7 +114,7 @@ To configure the SMTP mailer, add the following configuration to your `vars.yml`
 # Specify SMTP server hostname
 infisical_environment_variables_smtp_host: ""
 
-# Specify SMTP server port
+# Specify SMTP server port number
 infisical_environment_variables_smtp_port: 587
 
 # Specify SMTP server username
