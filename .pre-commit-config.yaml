@@ -47,10 +47,6 @@ repos:
     rev: v6.2.0
     hooks:
       - id: reuse
-  - repo: https://github.com/betterleaks/betterleaks
-    rev: v1.9.0
-    hooks:
-      - id: betterleaks
   - repo: https://github.com/ansible/ansible-lint
     rev: v26.8.0
     hooks:
