@@ -74,8 +74,8 @@ provisioner:
         # Variables required for Infisical to connect to the Postgres database
         infisical_database_hostname: "{{ postgres_connection_hostname }}"
         infisical_database_port: "{{ postgres_connection_port }}"
-        infisical_database_username: my_database_username
-        infisical_database_password: my_database_password
+        infisical_database_username: /#@my_database_username?%
+        infisical_database_password: /#@my_database_password?%
         infisical_database_name: infisical
         infisical_systemd_required_services_list_auto: |
           {{
