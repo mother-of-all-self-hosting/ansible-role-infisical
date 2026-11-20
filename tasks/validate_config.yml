@@ -47,9 +47,6 @@
   with_items:
     - infisical_uid
     - infisical_gid
-    - infisical_hostname
-    - infisical_path_prefix
-    - infisical_container_network
     - infisical_database_hostname
     - infisical_database_password
     - infisical_redis_hostname
